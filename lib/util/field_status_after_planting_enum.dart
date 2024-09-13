@@ -1,0 +1,4 @@
+enum FieldStatusAfterPlanting {
+  PartiallyCultivated,
+  FullyCultivated,
+}

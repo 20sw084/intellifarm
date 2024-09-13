@@ -1,0 +1,4 @@
+enum TaskSpecificToPlanting {
+  Yes,
+  No,
+}

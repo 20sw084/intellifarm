@@ -1,0 +1,4 @@
+enum TreatmentSpecificToPlanting {
+  Yes,
+  No,
+}

@@ -1,0 +1,4 @@
+enum PlantingType {
+  Planted,
+  Harvested,
+}

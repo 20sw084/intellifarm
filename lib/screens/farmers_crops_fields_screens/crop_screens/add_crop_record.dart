@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:intellifarm/controller/references.dart';
+
+import '../../../models/crops/crop.dart';
+import '../../../util/units_enum.dart';
+
+class AddCropRecord extends StatelessWidget {
+  AddCropRecord({super.key});
+
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers
+  final TextEditingController cropNameController = TextEditingController();
+  Units harvestUnitController = Units.Kilograms;
+  final TextEditingController notesController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("New Crop"),
+        backgroundColor: Colors.greenAccent,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await _saveForm(context);
+            },
+            icon: Icon(Icons.check_box),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 30),
+              TextFormField(
+                controller: cropNameController,
+                decoration: InputDecoration(
+                  labelText: 'Name of Crop  *',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'This field is required';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 30),
+              DropdownButtonFormField<Units>(
+                value: harvestUnitController,
+                decoration: InputDecoration(
+                  labelText: 'Select Harvest Unit *',
+                  border: OutlineInputBorder(),
+                ),
+                items: Units.values
+                    .map((option) => DropdownMenuItem<Units>(
+                  value: option,
+                  child: Text(option.toString().split('.')[1]),
+                ))
+                    .toList(),
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select necessary fields';
+                  }
+                  return null;
+                },
+                onChanged: (Units? newValue) {
+                  harvestUnitController = newValue!;
+                },
+              ),
+              SizedBox(height: 30),
+              TextFormField(
+                controller: notesController,
+                decoration: InputDecoration(
+                  labelText: 'Notes (for your convenience)',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 4,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveForm(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 15),
+                Text("Saving...", style: TextStyle(color: Colors.white)),
+              ],
+            ),
+          );
+        },
+      );
+
+      Crop c = Crop(
+        name: cropNameController.text,
+        harvestUnit: harvestUnitController,
+        notes: notesController.text,
+      );
+
+      References r = References();
+      String? id = await r.getLoggedUserId();
+
+      try {
+        if (id != null) {
+          await r.usersRef.doc(id).collection('crops').add(
+            c.getCropDataMap(),
+          );
+          Navigator.pop(context); // Close the loading dialog
+          Navigator.pop(context); // Close the form
+        } else {
+          print("Error: User ID is null");
+          Navigator.pop(context); // Close the loading dialog
+        }
+      } catch (e) {
+        print(e);
+        Navigator.pop(context); // Close the loading dialog
+      }
+    }
+  }
+}
