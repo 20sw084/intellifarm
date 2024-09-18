@@ -1,11 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/models/receipt.dart';
+import 'package:intellifarm/screens/activities_screens/plantings/view_image_screen.dart';
 import '../../../controller/references.dart';
 
 class ViewReceipts extends StatelessWidget {
-  String plantingId;
-  ViewReceipts({
+  final String plantingId;
+  const ViewReceipts({
     super.key,
     required this.plantingId,
   });
@@ -71,9 +74,22 @@ class ReceiptApprovedList extends StatelessWidget {
                   leading: SizedBox(
                     width: 50,
                     height: 50,
-                    child: Image.network(
-                      receipts[index]['imageURL'],
-                      fit: BoxFit.cover,
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewImageScreen(
+                              imageFile: receipts[index]['imageURL'],
+                              type: 'Approved Receipt', // Pass the type variable
+                            ),
+                          ),
+                        );
+                      },
+                      child: Image.network(
+                        receipts[index]['imageURL'],
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   title: Text('Receipt #${receipts[index].id}'),
@@ -162,11 +178,24 @@ class ReceiptRejectedList extends StatelessWidget {
                   leading: SizedBox(
                     width: 50,
                     height: 50,
-                    child: Image.network(
-                      receipts[index]['imageURL'],
-                      fit: BoxFit.cover,
-                      // width: 50,
-                      // height: 50,
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewImageScreen(
+                              imageFile: receipts[index]['imageURL'],
+                              type: 'Rejected Receipt', // Pass the type variable
+                            ),
+                          ),
+                        );
+                      },
+                      child: Image.network(
+                        receipts[index]['imageURL'],
+                        fit: BoxFit.cover,
+                        // width: 50,
+                        // height: 50,
+                      ),
                     ),
                   ),
                   title: Text('Receipt # ${receipts[index].id}'),
@@ -255,13 +284,26 @@ class ReceiptUnApprovedList extends StatelessWidget {
                   receipts[index].data() as Map<String, dynamic>;
               return Card(
                 child: ListTile(
-                  leading: Image.network(
-                    receiptData['imageURL'] ?? 'https://via.placeholder.com/50',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
+                  leading: GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewImageScreen(
+                            imageFile: receipts[index]['imageURL'],
+                            type: 'New Receipt', // Pass the type variable
+                          ),
+                        ),
+                      );
+                    },
+                    child: Image.network(
+                      receiptData['imageURL'] ?? 'https://via.placeholder.com/50',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  title: Text('Receipt #${receipts[index].id}'),
+                  title: Text('Receipt # ${receipts[index].id}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -409,8 +451,7 @@ class ReceiptUnApprovedList extends StatelessWidget {
   }
 
 
-  Future<List<QueryDocumentSnapshot>>
-      getAllReceiptsForSpecificPlanting() async {
+  Future<List<QueryDocumentSnapshot>> getAllReceiptsForSpecificPlanting() async {
     References r = References();
     String? id = await r.getLoggedUserId();
 

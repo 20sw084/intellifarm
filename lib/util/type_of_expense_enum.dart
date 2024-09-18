@@ -1,0 +1,4 @@
+enum TypeOfExpense {
+  ChooseCategory,
+  Other,
+}

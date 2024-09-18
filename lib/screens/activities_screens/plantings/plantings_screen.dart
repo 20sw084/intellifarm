@@ -4,6 +4,7 @@ import 'package:intellifarm/models/crops/cropPlanting.dart';
 import 'package:intellifarm/screens/activities_screens/harvests/add_harvest.dart';
 import 'package:intellifarm/screens/activities_screens/plantings/edit_planting.dart';
 import 'package:intellifarm/screens/activities_screens/plantings/view_receipts.dart';
+import 'package:intellifarm/screens/activities_screens/plantings/view_status.dart';
 import '../../../util/common_methods.dart';
 import '../tasks/add_activity_task.dart';
 import '../treatments/add_activity_treatment.dart';
@@ -385,10 +386,14 @@ class _PlantingsScreenState extends State<PlantingsScreen> {
                                             ),
                                             PopupMenuItem(
                                               value: 7,
-                                              child: Text('Duplicate'),
+                                              child: Text('View Status'),
                                             ),
                                             PopupMenuItem(
                                               value: 8,
+                                              child: Text('Duplicate'),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 9,
                                               child: Text('Delete'),
                                             ),
                                           ],
@@ -414,10 +419,13 @@ class _PlantingsScreenState extends State<PlantingsScreen> {
                                               Navigator.push(context, MaterialPageRoute(builder: (context) => ViewReceipts(plantingId: plantingId),));
                                               break;
                                             case 7:
-                                              print('Option 7: Duplicate selected');
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => ViewStatus(plantingId: plantingId),));
                                               break;
                                             case 8:
-                                              print('Option 8: Delete: selected');
+                                              print('Option 8: Duplicate selected');
+                                              break;
+                                            case 9:
+                                              print('Option 9: Delete: selected');
                                               break;
                                           }
                                         });

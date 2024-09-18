@@ -4,9 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intellifarm/util/task_specific_to_planting_enum.dart';
 import 'package:intellifarm/util/task_status_enum.dart';
+import 'package:intellifarm/util/transaction_specific_to_field_enum.dart';
+import 'package:intellifarm/util/transaction_specific_to_planting_enum.dart';
 import 'package:intellifarm/util/treatment_specific_to_planting_enum.dart';
 import 'package:intellifarm/util/treatment_status_enum.dart';
 import 'package:intellifarm/util/treatment_type_enum.dart';
+import 'package:intellifarm/util/type_of_expense_enum.dart';
+import 'package:intellifarm/util/type_of_income_enum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../controller/references.dart';
 import '../wrapper.dart';
@@ -64,7 +68,31 @@ TreatmentSpecificToPlanting treatmentSpecificToPlantingFromString(String type) {
     case 'No':
       return TreatmentSpecificToPlanting.No;
     default:
-      throw Exception('Unknown field type');
+      throw Exception('Unknown TreatmentSpecificToPlanting type');
+  }
+}
+
+TypeOfIncome typeOfIncomeFromString(String type) {
+  switch (type) {
+    case 'TypeOfIncome.ChooseCategory':
+      return TypeOfIncome.ChooseCategory;
+    case 'TypeOfIncome.FromHarvest':
+      return TypeOfIncome.FromHarvest;
+    case 'TypeOfIncome.Other':
+      return TypeOfIncome.Other;
+    default:
+      throw Exception('Unknown TypeOfIncome type');
+  }
+}
+
+TypeOfExpense typeOfExpenseFromString(String type) {
+  switch (type) {
+    case 'TypeOfExpense.ChooseCategory':
+      return TypeOfExpense.ChooseCategory;
+    case 'TypeOfExpense.Other':
+      return TypeOfExpense.Other;
+    default:
+      throw Exception('Unknown TypeOfExpense type');
   }
 }
 
@@ -75,7 +103,29 @@ TaskSpecificToPlanting taskSpecificToPlantingFromString(String type) {
     case 'No':
       return TaskSpecificToPlanting.No;
     default:
-      throw Exception('Unknown field type');
+      throw Exception('Unknown TaskSpecificToPlanting type');
+  }
+}
+
+TransactionSpecificToPlanting transactionSpecificToPlantingFromString(String type) {
+  switch (type) {
+    case 'Yes':
+      return TransactionSpecificToPlanting.Yes;
+    case 'No':
+      return TransactionSpecificToPlanting.No;
+    default:
+      throw Exception('Unknown TransactionSpecificToPlanting type');
+  }
+}
+
+TransactionSpecificToField transactionSpecificToFieldFromString(String type) {
+  switch (type) {
+    case 'Yes':
+      return TransactionSpecificToField.Yes;
+    case 'No':
+      return TransactionSpecificToField.No;
+    default:
+      throw Exception('Unknown TransactionSpecificToPlanting type');
   }
 }
 
@@ -206,6 +256,58 @@ Future<List<DocumentSnapshot>> getAllHarvests() async {
   return allHarvests;
 }
 
+Future<List<DocumentSnapshot>> getAllIncomeTransactions() async {
+  References r = References();
+  String? id = await r.getLoggedUserId();
+  String typeOfIncome = "TypeOfIncome"; // Replace this with the actual income type identifier
+  QuerySnapshot transSnapshot = await r.usersRef.doc(id).collection("transactions").get();
+  QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
+  QuerySnapshot fieldsSnapshot = await r.usersRef.doc(id).collection("fields").get();
+
+  List<DocumentSnapshot> incomeTransactions = [];
+
+  // Filter transactions in the main transactions collection
+  for (QueryDocumentSnapshot transDoc in transSnapshot.docs) {
+    if (transDoc['typeOfTransaction'].toString().startsWith(typeOfIncome)) {
+      incomeTransactions.add(transDoc);
+    }
+  }
+
+  // Filter transactions in the crops' transactions subcollections
+  for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
+    QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
+
+    for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
+      QuerySnapshot transactionsSnapshot =
+      await plantingDoc.reference.collection("transactions").get();
+
+      for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+        if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfIncome)) {
+          incomeTransactions.add(transactionDoc);
+        }
+      }
+    }
+  }
+
+  // Filter transactions in the fields' transactions subcollections
+  for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
+    QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
+
+    for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+      if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfIncome)) {
+        incomeTransactions.add(transactionDoc);
+      }
+    }
+  }
+
+  // TODO: Make this correct later.
+  // Fetch all harvests and add to income transactions
+  // List<DocumentSnapshot> allHarvests = await getAllHarvests();
+  // incomeTransactions.addAll(allHarvests); // Append harvests to the income transactions
+
+  return incomeTransactions;
+}
+
 Future<List<DocumentSnapshot>> getAllTreatments() async {
   References r = References();
   String? id = await r.getLoggedUserId();
@@ -232,6 +334,53 @@ Future<List<DocumentSnapshot>> getAllTreatments() async {
   }
 
   return allTreatments;
+}
+
+Future<List<DocumentSnapshot>> getAllExpenseTransactions() async {
+  References r = References();
+  String? id = await r.getLoggedUserId();
+  String typeOfExpense = "TypeOfExpense"; // Replace this with the actual income type identifier
+  QuerySnapshot transSnapshot = await r.usersRef.doc(id).collection("transactions").get();
+  QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
+  QuerySnapshot fieldsSnapshot = await r.usersRef.doc(id).collection("fields").get();
+
+  List<DocumentSnapshot> expenseTransactions = [];
+
+  // Filter transactions in the main transactions collection
+  for (QueryDocumentSnapshot transDoc in transSnapshot.docs) {
+    if (transDoc['typeOfTransaction'].toString().startsWith(typeOfExpense)) {
+      expenseTransactions.add(transDoc);
+    }
+  }
+
+  // Filter transactions in the crops' transactions subcollections
+  for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
+    QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
+
+    for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
+      QuerySnapshot transactionsSnapshot =
+      await plantingDoc.reference.collection("transactions").get();
+
+      for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+        if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfExpense)) {
+          expenseTransactions.add(transactionDoc);
+        }
+      }
+    }
+  }
+
+  // Filter transactions in the fields' transactions subcollections
+  for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
+    QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
+
+    for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+      if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfExpense)) {
+        expenseTransactions.add(transactionDoc);
+      }
+    }
+  }
+
+  return expenseTransactions;
 }
 
 Future<List<DocumentSnapshot>> getAllTasks() async {

@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intellifarm/models/transaction.dart';
 import 'package:intellifarm/screens/transactions_screens/add_transaction_record.dart';
+import '../../util/common_methods.dart';
 import '../../widgets/confirm_delete_transaction_dialog.dart';
+import 'edit_view_transaction_record.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -314,13 +318,36 @@ class _TransactionsScreenState extends State<TransactionsScreen>
         body: TabBarView(
           controller: _tabController,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
+            FutureBuilder<List<DocumentSnapshot>>(
+              future: getAllIncomeTransactions(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error is: ${snapshot.error}"));
+                } else if (snapshot.hasData) {
+                  List<DocumentSnapshot> transactions = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      var transactionData = transactions[index].data() as Map<String, dynamic>;
+                      TransactionModel trans = TransactionModel(
+                        transactionSpecificToField: transactionSpecificToFieldFromString(transactionData["transactionSpecificToField"]),
+                        fieldName: transactionData["fieldName"],
+                        transactionSpecificToPlanting: (transactionData["transactionSpecificToPlanting"] == null ? null : transactionSpecificToPlantingFromString(transactionData["transactionSpecificToPlanting"])),
+                        plantingNameTransaction: transactionData["plantingNameTransaction"],
+                        typeOfTransaction: transactionData["typeOfTransaction"],
+                        transactionTypeOther: transactionData["transactionTypeOther"],
+                        earningAmount: transactionData["earningAmount"],
+                        transactionDate: transactionData["transactionDate"],
+                        receiptNumber: transactionData["receiptNumber"],
+                        customerName: transactionData["customerName"],
+                        notes: transactionData["notes"] ?? "",
+                      );
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: 125,
                         child: Card(
                           child: Padding(
                             padding: const EdgeInsets.only(
@@ -332,17 +359,18 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Saleem Flour Mills [Wheat, # 1 (Hyderabad Field)]",
+                                  "Saleem Flour Mills [${(trans.plantingNameTransaction == null || trans.plantingNameTransaction?.split("|").isEmpty == true) ? "" :
+                                  "${(trans.plantingNameTransaction!.split("|").length > 0) ? trans.plantingNameTransaction!.split("|")[0] : ""}${(trans.plantingNameTransaction!.split("|").length > 1) ? ", ${trans.plantingNameTransaction!.split("|")[1]}" : ""}"} ${(trans.fieldName==null ? "": ", ${trans.fieldName}")}]",
                                   style: TextStyle(
                                     fontSize: 16,
                                   ),
                                 ),
-                                Text("Jun 14, 2024"),
+                                Text(trans.transactionDate),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Text(
-                                      "800K PKR",
+                                      "${trans.earningAmount}",
                                       style: TextStyle(
                                         fontSize: 16,
                                       ),
@@ -360,14 +388,18 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //       builder: (context) =>
-                                                //           AddTransactionRecord(type: value
-                                                //               ? "Currently in Income tab"
-                                                //               : "Currently in Expenses tab"),
-                                                //     ));
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        EditViewTransactionRecord(
+                                                      type: isIncome.value
+                                                          ? "Income"
+                                                          : "Expense",
+                                                      transaction: trans,
+                                                        ),
+                                                  ),
+                                                );
                                                 // isCheckboxChecked = "Last 7 days";
                                               },
                                               child: Text('Edit/View Record'),
@@ -377,7 +409,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                                               onTap: () {
                                                 showDialog(
                                                   context: context,
-                                                  builder: (BuildContext context) {
+                                                  builder:
+                                                      (BuildContext context) {
                                                     return ConfirmDeleteTransactionDialog(
                                                       onConfirm: () {
                                                         // TODO: Perform delete operation here
@@ -397,20 +430,31 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                                           // Handle the selected value
                                           switch (value) {
                                             case 1:
-                                              // TODO: Edit/view record
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EditViewTransactionRecord(
+                                                        type: isIncome.value
+                                                            ? "Income"
+                                                            : "Expense",
+                                                        transaction: trans,
+                                                      ),
+                                                ),
+                                              );
                                               break;
                                             case 2:
-                                              // showDialog(
-                                              //   context: context,
-                                              //   builder: (BuildContext context) {
-                                              //     return ConfirmDeleteFieldDialog(
-                                              //       onConfirm: () {
-                                              //         // TODO: Perform delete operation here
-                                              //         print('Item deleted!');
-                                              //       },
-                                              //     );
-                                              //   },
-                                              // );
+                                            // showDialog(
+                                            //   context: context,
+                                            //   builder: (BuildContext context) {
+                                            //     return ConfirmDeleteFieldDialog(
+                                            //       onConfirm: () {
+                                            //         // TODO: Perform delete operation here
+                                            //         print('Item deleted!');
+                                            //       },
+                                            //     );
+                                            //   },
+                                            // );
                                               break;
                                           }
                                         });
@@ -423,22 +467,47 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: Text("No plantings available"));
+                }
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: const [
-                  Row(
-                    children: [
-                      Expanded(
+            FutureBuilder<List<DocumentSnapshot>>(
+              future: getAllExpenseTransactions(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error is: ${snapshot.error}"));
+                } else if (snapshot.hasData) {
+                  List<DocumentSnapshot> transactions = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      var transactionData = transactions[index].data() as Map<String, dynamic>;
+                      TransactionModel trans = TransactionModel(
+                        transactionSpecificToField: transactionSpecificToFieldFromString(transactionData["transactionSpecificToField"]),
+                        fieldName: transactionData["fieldName"],
+                        transactionSpecificToPlanting: (transactionData["transactionSpecificToPlanting"] == null ? null : transactionSpecificToPlantingFromString(transactionData["transactionSpecificToPlanting"])),
+                        plantingNameTransaction: transactionData["plantingNameTransaction"],
+                        typeOfTransaction: transactionData["typeOfTransaction"],
+                        transactionTypeOther: transactionData["transactionTypeOther"],
+                        earningAmount: transactionData["earningAmount"],
+                        transactionDate: transactionData["transactionDate"],
+                        receiptNumber: transactionData["receiptNumber"],
+                        customerName: transactionData["customerName"],
+                        notes: transactionData["notes"] ?? "",
+                      );
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: 125,
                         child: Card(
                           child: Padding(
-                            padding: EdgeInsets.only(
+                            padding: const EdgeInsets.only(
                               top: 8.0,
                               left: 8.0,
                               right: 8.0,
@@ -447,17 +516,18 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Saleem Flour Mills [Wheat, # 1 (Hyderabad Field)]",
+                                  "Raheem Flour Mills [${(trans.plantingNameTransaction == null || trans.plantingNameTransaction?.split("|").isEmpty == true) ? "" :
+                                  "${(trans.plantingNameTransaction!.split("|").length > 0) ? trans.plantingNameTransaction!.split("|")[0] : ""}${(trans.plantingNameTransaction!.split("|").length > 1) ? ", ${trans.plantingNameTransaction!.split("|")[1]}" : ""}"} ${(trans.fieldName==null ? "": ", ${trans.fieldName}")}]",
                                   style: TextStyle(
                                     fontSize: 16,
                                   ),
                                 ),
-                                Text("Jun 14, 2024"),
+                                Text(trans.transactionDate),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Text(
-                                      "240K PKR",
+                                      "${trans.earningAmount}",
                                       style: TextStyle(
                                         fontSize: 16,
                                       ),
@@ -466,7 +536,86 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                                       width: 30,
                                     ),
                                     IconButton(
-                                      onPressed: null,
+                                      onPressed: () {
+                                        showMenu(
+                                          context: context,
+                                          position: RelativeRect.fromLTRB(
+                                              50, 50, 0, 0),
+                                          items: [
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        EditViewTransactionRecord(
+                                                          type: isIncome.value
+                                                              ? "Income"
+                                                              : "Expense",
+                                                          transaction: trans,
+                                                        ),
+                                                  ),
+                                                );
+                                                // isCheckboxChecked = "Last 7 days";
+                                              },
+                                              child: Text('Edit/View Record'),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 2,
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return ConfirmDeleteTransactionDialog(
+                                                      onConfirm: () {
+                                                        // TODO: Perform delete operation here
+                                                        print('Item deleted!');
+                                                      },
+                                                    );
+                                                  },
+                                                );
+                                                // isCheckboxChecked = "Custom Range";
+                                              },
+                                              child: Text('Delete'),
+                                            ),
+                                          ],
+                                          // Handle the selected menu item
+                                          elevation: 8.0,
+                                        ).then((value) {
+                                          // Handle the selected value
+                                          switch (value) {
+                                            case 1:
+                                              Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditViewTransactionRecord(
+                                                      type: isIncome.value
+                                                          ? "Income"
+                                                          : "Expense",
+                                                      transaction: trans,
+                                                    ),
+                                              ),
+                                            );
+                                              break;
+                                            case 2:
+                                            // showDialog(
+                                            //   context: context,
+                                            //   builder: (BuildContext context) {
+                                            //     return ConfirmDeleteFieldDialog(
+                                            //       onConfirm: () {
+                                            //         // TODO: Perform delete operation here
+                                            //         print('Item deleted!');
+                                            //       },
+                                            //     );
+                                            //   },
+                                            // );
+                                              break;
+                                          }
+                                        });
+                                      },
                                       icon: Icon(Icons.more_vert),
                                     ),
                                   ],
@@ -475,12 +624,66 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: Text("No plantings available"));
+                }
+              },
             ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Column(
+            //     children: const [
+            //       Row(
+            //         children: [
+            //           Expanded(
+            //             child: Card(
+            //               child: Padding(
+            //                 padding: EdgeInsets.only(
+            //                   top: 8.0,
+            //                   left: 8.0,
+            //                   right: 8.0,
+            //                 ),
+            //                 child: Column(
+            //                   crossAxisAlignment: CrossAxisAlignment.start,
+            //                   children: [
+            //                     Text(
+            //                       "Saleem Flour Mills [Wheat, # 1 (Hyderabad Field)]",
+            //                       style: TextStyle(
+            //                         fontSize: 16,
+            //                       ),
+            //                     ),
+            //                     Text("Jun 14, 2024"),
+            //                     Row(
+            //                       mainAxisAlignment: MainAxisAlignment.end,
+            //                       children: [
+            //                         Text(
+            //                           "240K PKR",
+            //                           style: TextStyle(
+            //                             fontSize: 16,
+            //                           ),
+            //                         ),
+            //                         SizedBox(
+            //                           width: 30,
+            //                         ),
+            //                         IconButton(
+            //                           onPressed: null,
+            //                           icon: Icon(Icons.more_vert),
+            //                         ),
+            //                       ],
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
         floatingActionButton: ValueListenableBuilder<bool>(
@@ -493,9 +696,9 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddTransactionRecord(type: value
-                            ? "Income"
-                            : "Expense",),
+                        builder: (context) => AddTransactionRecord(
+                          type: value ? "Income" : "Expense",
+                        ),
                       ));
                   print(value
                       ? "Currently in Income tab"

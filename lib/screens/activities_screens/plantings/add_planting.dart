@@ -219,17 +219,6 @@ class AddPlanting extends StatelessWidget {
                               onChanged: (value) {
                                 debugPrint('selected onchange: $value');
                                 _cropVariety = value.toString();
-                                // setState(
-                                //       () {
-                                //     debugPrint('make selected: $value');
-                                //     // Selected value will be stored
-                                //     carMake = value;
-                                //     // Default dropdown value won't be displayed anymore
-                                //     setDefaultMake = false;
-                                //     // Set makeModel to true to display first car from list
-                                //     setDefaultMakeModel = true;
-                                //   },
-                                // );
                               },
                             );
                           },

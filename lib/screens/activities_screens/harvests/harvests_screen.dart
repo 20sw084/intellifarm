@@ -233,8 +233,7 @@ class _HarvestsScreenState extends State<HarvestsScreen> {
             : Text("Harvests"),
       ),
       body: FutureBuilder<List<DocumentSnapshot>>(
-        future:
-            getAllHarvests(), // Use the function that returns List<DocumentSnapshot>
+        future: getAllHarvests(),
         builder: (BuildContext context,
             AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

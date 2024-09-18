@@ -1,0 +1,4 @@
+enum TransactionSpecificToPlanting {
+  Yes,
+  No,
+}

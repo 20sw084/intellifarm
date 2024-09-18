@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intellifarm/screens/reports_screens/field_status_screens/field_status_report_screen.dart';
-import 'package:intellifarm/screens/reports_screens/tasks_screeens/tasks_report_screen.dart';
+import 'package:intellifarm/screens/reports_screens/tasks_screens/tasks_report_screen.dart';
 import 'package:intellifarm/screens/reports_screens/transactions_screens/transactions_report_screen.dart';
 
 import '../../widgets/card_widget.dart';
