@@ -395,126 +395,142 @@ class AddTransactionRecord extends StatelessWidget {
             notes: _notesController.text,
           );
 
-          if (_selectedTransactionSpecificToField.value ==
-              TransactionSpecificToField.Yes) {
-            if (t.fieldName == null || t.fieldName!.isEmpty) {
-              print("Error: Field name is null or empty");
-              return;
-            }
-
-            if (_selectedTransactionSpecificToPlanting.value ==
-                TransactionSpecificToPlanting.Yes) {
-              if (t.plantingNameTransaction == null ||
-                  t.plantingNameTransaction!.isEmpty) {
-                print("Error: Planting name is null or empty");
+          if(t.typeOfTransaction.endsWith(TypeOfIncome.FromHarvest.toString())){
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  "Record not saved: Harvest Income must be recorded on its corresponding harvest record.",
+                  style: TextStyle(color: Colors.white), // Text color for contrast
+                ),
+                backgroundColor: Colors.red, // Red background to indicate error
+              ),
+            );
+          }
+          else {
+            if (_selectedTransactionSpecificToField.value ==
+                TransactionSpecificToField.Yes) {
+              if (t.fieldName == null || t.fieldName!.isEmpty) {
+                print("Error: Field name is null or empty");
                 return;
               }
 
-              List<String> plantingParts = t.plantingNameTransaction!
-                  .split("|")
-                  .map((part) => part.trim())
-                  .toList();
-              if (plantingParts.length < 2) {
-                print("Error: Planting name does not have the correct format");
-                return;
+              if (_selectedTransactionSpecificToPlanting.value ==
+                  TransactionSpecificToPlanting.Yes) {
+                if (t.plantingNameTransaction == null ||
+                    t.plantingNameTransaction!.isEmpty) {
+                  print("Error: Planting name is null or empty");
+                  return;
+                }
+
+                List<String> plantingParts = t.plantingNameTransaction!
+                    .split("|")
+                    .map((part) => part.trim())
+                    .toList();
+                if (plantingParts.length < 2) {
+                  print(
+                      "Error: Planting name does not have the correct format");
+                  return;
+                }
+
+                cropName = plantingParts[0];
+                cropVariety = plantingParts[1];
+
+                // fieldName = t.fieldName;
+
+                if (cropName == null || _selectedFieldName == null ||
+                    cropVariety == null) {
+                  print("Error: Some required values are null");
+                  return; // Exit the function early if any required value is null
+                }
+
+                String? cropId = await r.getCropIdByName(cropName!);
+                if (cropId == null) {
+                  print("Error: cropId is null");
+                  return; // Exit the function early if cropId is null
+                }
+
+                String? plantingId = await r.getPlantingIdByFieldAndCropVariety(
+                    cropId, _selectedFieldName!, cropVariety!);
+                if (plantingId == null) {
+                  print("Error: plantingId is null");
+                  return; // Exit the function early if plantingId is null
+                }
+                await r.usersRef.doc(id).collection('crops').doc(cropId)
+                    .collection("plantings").doc(plantingId).collection(
+                    "transactions")
+                    .add(
+                  t.getTransactionDataMap(),
+                );
+                print(
+                    "Success: Transaction added successfully in Crop Plantings.");
               }
 
-              cropName = plantingParts[0];
-              cropVariety = plantingParts[1];
-
-              // fieldName = t.fieldName;
-
-              if (cropName == null || _selectedFieldName == null ||
-                  cropVariety == null) {
-                print("Error: Some required values are null");
-                return; // Exit the function early if any required value is null
+              else if (_selectedTransactionSpecificToPlanting.value ==
+                  TransactionSpecificToPlanting.No) {
+                String? fieldId = await r.getFieldIdByName(t.fieldName!);
+                if (fieldId == null) {
+                  print("Error: fieldId is null");
+                  return; // Exit the function early if fieldId is null
+                }
+                await r.usersRef.doc(id).collection('fields')
+                    .doc(fieldId)
+                    .collection("transactions")
+                    .add(
+                  t.getTransactionDataMap(),
+                );
+                print("Success: Transaction added successfully in Fields.");
               }
 
-              String? cropId = await r.getCropIdByName(cropName!);
-              if (cropId == null) {
-                print("Error: cropId is null");
-                return; // Exit the function early if cropId is null
+              else {
+                print("Error: Unexpected transactionSpecificToPlanting value");
               }
 
-              String? plantingId = await r.getPlantingIdByFieldAndCropVariety(
-                  cropId, _selectedFieldName!, cropVariety!);
-              if (plantingId == null) {
-                print("Error: plantingId is null");
-                return; // Exit the function early if plantingId is null
-              }
-              await r.usersRef.doc(id).collection('crops').doc(cropId)
-                  .collection("plantings").doc(plantingId).collection(
-                  "transactions")
-                  .add(
-                t.getTransactionDataMap(),
-              );
-              print(
-                  "Success: Transaction added successfully in Crop Plantings.");
+              // List<String> plantingParts = t.fieldName!.split("|").map((part) => part.trim()).toList();
+              // if (plantingParts.length != 2) {
+              //   print("Error: Planting name does not have the correct format");
+              //   return;
+              // }
+              //
+              // cropName = plantingParts[0];
+              // cropVariety = plantingParts[1];
+              //
+              // // fieldName = t.fieldName;
+              //
+              // if (cropName == null || _selectedFieldName == null || cropVariety == null) {
+              //   print("Error: Some required values are null");
+              //   return; // Exit the function early if any required value is null
+              // }
+              //
+              // String? cropId = await r.getCropIdByName(cropName!);
+              // if (cropId == null) {
+              //   print("Error: cropId is null");
+              //   return; // Exit the function early if cropId is null
+              // }
+              //
+              // String? plantingId = await r.getPlantingIdByFieldAndCropVariety(cropId, _selectedFieldName!, cropVariety!);
+              // if (plantingId == null) {
+              //   print("Error: plantingId is null");
+              //   return; // Exit the function early if plantingId is null
+              // }
+              // await r.usersRef.doc(id).collection('crops').doc(cropId).collection("plantings").doc(plantingId).collection("treatments").add(
+              //   t.getTransactionDataMap(),
+              // );
+              // print("Success: Treatment added successfully in Crop Plantings.");
             }
 
-            else if (_selectedTransactionSpecificToPlanting.value ==
-                TransactionSpecificToPlanting.No) {
-              String? fieldId = await r.getFieldIdByName(t.fieldName!);
-              if (fieldId == null) {
-                print("Error: fieldId is null");
-                return; // Exit the function early if fieldId is null
-              }
-              await r.usersRef.doc(id).collection('fields')
-                  .doc(fieldId)
-                  .collection("transactions")
-                  .add(
+            else if (_selectedTransactionSpecificToField.value ==
+                TransactionSpecificToField.No) {
+              await r.usersRef.doc(id).collection('transactions').add(
                 t.getTransactionDataMap(),
               );
-              print("Success: Transaction added successfully in Fields.");
+              print("Success: Transaction added successfully in Users.");
             }
 
             else {
               print("Error: Unexpected transactionSpecificToPlanting value");
             }
 
-            // List<String> plantingParts = t.fieldName!.split("|").map((part) => part.trim()).toList();
-            // if (plantingParts.length != 2) {
-            //   print("Error: Planting name does not have the correct format");
-            //   return;
-            // }
-            //
-            // cropName = plantingParts[0];
-            // cropVariety = plantingParts[1];
-            //
-            // // fieldName = t.fieldName;
-            //
-            // if (cropName == null || _selectedFieldName == null || cropVariety == null) {
-            //   print("Error: Some required values are null");
-            //   return; // Exit the function early if any required value is null
-            // }
-            //
-            // String? cropId = await r.getCropIdByName(cropName!);
-            // if (cropId == null) {
-            //   print("Error: cropId is null");
-            //   return; // Exit the function early if cropId is null
-            // }
-            //
-            // String? plantingId = await r.getPlantingIdByFieldAndCropVariety(cropId, _selectedFieldName!, cropVariety!);
-            // if (plantingId == null) {
-            //   print("Error: plantingId is null");
-            //   return; // Exit the function early if plantingId is null
-            // }
-            // await r.usersRef.doc(id).collection('crops').doc(cropId).collection("plantings").doc(plantingId).collection("treatments").add(
-            //   t.getTransactionDataMap(),
-            // );
-            // print("Success: Treatment added successfully in Crop Plantings.");
-          }
-
-          else if (_selectedTransactionSpecificToField.value ==
-              TransactionSpecificToField.No) {
-            await r.usersRef.doc(id).collection('transactions').add(
-              t.getTransactionDataMap(),
-            );
-            print("Success: Transaction added successfully in Users.");
-          }
-
-          else {
-            print("Error: Unexpected transactionSpecificToPlanting value");
+            Navigator.pop(context);
           }
         }
         else {
@@ -655,8 +671,9 @@ class AddTransactionRecord extends StatelessWidget {
           else {
             print("Error: Unexpected transactionSpecificToPlanting value");
           }
+
+          Navigator.pop(context);
         }
-        Navigator.pop(context);
       } catch (e) {
         print("Error: $e");
       }
