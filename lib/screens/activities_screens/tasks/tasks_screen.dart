@@ -138,8 +138,8 @@ class _TasksScreenState extends State<TasksScreen> {
                     onTap: () {
                       isCheckboxChecked = "Previous Month";
                     },
-                    child: Text('Previous Month'),
                     value: 10,
+                    child: Text('Previous Month'),
                   ),
                   CheckedPopupMenuItem(
                     checked: (isCheckboxChecked.compareTo("Last 3 Months") == 0)
@@ -396,20 +396,20 @@ class _TasksScreenState extends State<TasksScreen> {
                                             100, 100, 0, 0),
                                         items: [
                                           PopupMenuItem(
-                                            child: Text('Edit Record'),
                                             value: 1,
+                                            child: Text('Edit Record'),
                                           ),
                                           PopupMenuItem(
-                                            child: Text('Mark as Done'),
                                             value: 2,
+                                            child: Text('Mark as Done'),
                                           ),
                                           PopupMenuItem(
-                                            child: Text('Duplicate'),
                                             value: 3,
+                                            child: Text('Duplicate'),
                                           ),
                                           PopupMenuItem(
-                                            child: Text('Delete'),
                                             value: 4,
+                                            child: Text('Delete'),
                                           ),
                                         ],
                                         elevation: 8.0,

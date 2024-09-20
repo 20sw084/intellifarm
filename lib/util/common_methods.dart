@@ -503,7 +503,7 @@ Future<List<DocumentSnapshot>> getAllTasks() async {
   List<DocumentSnapshot> allTasks = [];
 
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-    // Get all the plantings in the subcollection for each crop
+    // Get all the plantings in the collection for each crop
     QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
 
     for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
@@ -514,7 +514,7 @@ Future<List<DocumentSnapshot>> getAllTasks() async {
   }
 
   for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
-    // Get all the plantings in the subcollection for each crop
+    // Get all the plantings in the collection for each crop
     QuerySnapshot treatmentsSnapshot = await fieldDoc.reference.collection("tasks").get();
     allTasks.addAll(treatmentsSnapshot.docs);
   }

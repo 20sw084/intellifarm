@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../external_libs/appbar_dropdown/appbar_dropdown.dart';
+import '../../../models/task.dart';
+import '../../../util/common_methods.dart';
 
 class TasksReportScreen extends StatefulWidget {
   const TasksReportScreen({super.key});
@@ -199,8 +202,8 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
               top: 8.0,
             ),
             child: Align(
-              child: Text("Last 3 Months"),
               alignment: Alignment.topLeft,
+              child: Text("Last 3 Months"),
             ),
           ),
           Padding(
@@ -210,8 +213,8 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
               bottom: 8.0,
             ),
             child: Align(
-              child: Text("(March 23 2024 - June 23 2024)"),
               alignment: Alignment.topLeft,
+              child: Text("(March 23 2024 - June 23 2024)"),
             ),
           ),
           SizedBox(
@@ -260,7 +263,8 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.20,
+                        width:
+                        MediaQuery.of(context).size.width * 0.20,
                       ),
                       Text(
                         'Name',
@@ -282,51 +286,85 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              padding: EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.greenAccent,
-                  width: 2.0,
-                ),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Mar 24, 2024',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.greenAccent,
+          FutureBuilder<List<DocumentSnapshot>>(
+            future: getAllTasks(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("Error is: ${snapshot.error}"));
+              } else if (snapshot.hasData) {
+                List<DocumentSnapshot> tasks = snapshot.data!;
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      var tasksData = tasks[index].data() as Map<String, dynamic>;
+                      Task t = Task(
+                        taskDate: tasksData["taskDate"],
+                        taskStatus: taskStatusFromString(tasksData["taskStatus"]),
+                        taskName: tasksData["taskName"],
+                        fieldName: tasksData["fieldName"],
+                        taskSpecificToPlanting: taskSpecificToPlantingFromString(
+                            tasksData["taskSpecificToPlanting"]),
+                        plantingName: tasksData["plantingName"] ?? " ",
+                        notes: tasksData["notes"] ?? "",
+                      );
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.greenAccent,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    t.taskDate,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.greenAccent,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.06,
+                                  ),
+                                  Text(
+                                    t.taskName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      // color: Colors.greenAccent,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                t.fieldName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  // color: Colors.greenAccent,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.06,
-                      ),
-                      Text(
-                        'Watering',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          // color: Colors.greenAccent,
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                  Text(
-                    'Latifabad, Hyderabad',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      // color: Colors.greenAccent,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                );
+              } else {
+                return const Center(child: Text("No plantings available"));
+              }
+            },
           ),
           Divider(),
         ],
