@@ -17,10 +17,10 @@ class AddFieldPlanting extends StatefulWidget {
   });
 
   @override
-  _AddFieldPlantingState createState() => _AddFieldPlantingState();
+  AddFieldPlantingState createState() => AddFieldPlantingState();
 }
 
-class _AddFieldPlantingState extends State<AddFieldPlanting> {
+class AddFieldPlantingState extends State<AddFieldPlanting> {
   final _formKey = GlobalKey<FormState>();
   String? cropName;
 
@@ -44,6 +44,7 @@ class _AddFieldPlantingState extends State<AddFieldPlanting> {
   final TextEditingController _notesController = TextEditingController();
   DateTime? _selectedPlantingDate;
   DateTime? _selectedHarvestingDate;
+
 
   Future<void> _selectPlantingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(

@@ -1,10 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intellifarm/util/common_methods.dart';
 import 'dart:math' as math;
-
 import '../../../external_libs/appbar_dropdown/appbar_dropdown.dart';
 import '../../../external_libs/pie_chart/src/chart_values_options.dart';
 import '../../../external_libs/pie_chart/src/legend_options.dart';
 import '../../../external_libs/pie_chart/src/pie_chart.dart';
+import '../../../models/crops/cropPlanting.dart';
 
 class FieldStatusReportScreen extends StatefulWidget {
   const FieldStatusReportScreen({super.key});
@@ -17,6 +19,7 @@ class FieldStatusReportScreen extends StatefulWidget {
 enum LegendShape { circle, rectangle }
 
 class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
+
   final dataMap = <String, double>{
     "Available": 4,
     "Cultivated": 3,
@@ -419,6 +422,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                 top: 8.0,
               ),
               child: Align(
+                alignment: Alignment.topLeft,
                 child: Text(
                   "Field by Status",
                   style: TextStyle(
@@ -426,7 +430,6 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                alignment: Alignment.topLeft,
               ),
             ),
             Padding(
@@ -489,7 +492,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                     ),
                     IntrinsicWidth(
                       child: Column(
-                        children: [
+                        children: const [
                           Text(
                             'Planting',
                             style: TextStyle(
@@ -515,79 +518,132 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.greenAccent,
-                    width: 2.0,
-                  ),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Badin Field',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.greenAccent,
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.10,
-                        ),
-                        Text(
-                          'Rice, 1 number',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IntrinsicWidth(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Mar 17, 2024',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.greenAccent,
+            FutureBuilder<List<DocumentSnapshot>>(
+              future: getAllPlantings(),
+              builder: (BuildContext context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error is: ${snapshot.error}"));
+                } else if (snapshot.hasData) {
+                  List<DocumentSnapshot> plantings = snapshot.data!;
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: plantings.length,
+                      itemBuilder: (context, index) {
+                        var plantingData = plantings[index].data() as Map<String, dynamic>;
+                        // String cropName = plantingData["cropName"];
+                        // String plantingId = plantings[index].id;
+                        // final String plantingDateString =
+                        //     plantingData['plantingDate'].toString() ?? "2000-01-01";
+                        // DateTime plantingDate = parseDateString(plantingDateString);
+                        // int pdAge = calculateAgeInDays(plantingDate);
+                        CropPlanting cr = CropPlanting(
+                          plantingDate: plantingData["plantingDate"],
+                          plantingType: plantingTypeFromString(plantingData["plantingType"]),
+                          cropName: plantingData["cropName"],
+                          varietyName: plantingData["varietyName"],
+                          fieldName: plantingData["fieldName"],
+                          quantityPlanted: plantingData["quantityPlanted"],
+                          notes: plantingData["notes"],
+                          distanceBetweenPlants: plantingData["distanceBetweenPlants"],
+                          estimatedYield: plantingData["estimatedYield"],
+                          firstHarvestDate: plantingData["firstHarvestDate"],
+                          seedCompany: plantingData["seedCompany"],
+                          seedLotNumber: plantingData["seedLotNumber"],
+                          seedOrigin: plantingData["seedOrigin"],
+                          seedType: plantingData["seedType"],
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            padding: EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.greenAccent,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          cr.fieldName!,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.greenAccent,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+                                      Expanded(
+                                        child: Text(
+                                          "${cr.cropName}, ${cr.varietyName}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: const [
+                                      Text(
+                                        'Mar 17, 2024',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.greenAccent,
+                                        ),
+                                      ),
+                                      Divider(
+                                        color: Colors.greenAccent,
+                                        thickness: 2.0,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'Nov 22, 2024 -',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.orangeAccent,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Jan 01, 2025',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.orangeAccent,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Divider(
-                            color: Colors.greenAccent,
-                            thickness: 2.0,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                'Nov 22, 2024 -',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orangeAccent,
-                                ),
-                              ),
-                              Text(
-                                'Jan 01, 2025',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orangeAccent,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  ],
-                ),
-              ),
+                  );
+                } else {
+                  return const Center(child: Text("No plantings available"));
+                }
+              },
             ),
             Divider(),
           ],

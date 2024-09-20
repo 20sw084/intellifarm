@@ -7,7 +7,8 @@ import 'package:intl/intl.dart';
 import '../../../controller/references.dart';
 import '../../../models/crops/cropPlanting.dart';
 import '../../../util/common_methods.dart';
-import '../../farmers_crops_fields_screens/crop_screens/add_crop_variety.dart'; // Import for date formatting
+import '../../../util/field_status_after_planting_enum.dart';
+import '../../farmers_crops_fields_screens/crop_screens/add_crop_variety.dart';
 
 class AddPlanting extends StatelessWidget {
   String cropName;
@@ -38,6 +39,10 @@ class AddPlanting extends StatelessWidget {
   final TextEditingController _notesController = TextEditingController();
   DateTime? _selectedPlantingDate;
   DateTime? _selectedHarvestingDate;
+
+  final ValueNotifier<String?> fieldNameNotifier = ValueNotifier<String?>(null);
+  final ValueNotifier<FieldStatusAfterPlanting?> fieldStatusNotifier =
+      ValueNotifier<FieldStatusAfterPlanting?>(null);
 
   Future<void> _selectPlantingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -235,7 +240,9 @@ class AddPlanting extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddCropVariety(cropName: cropName,),
+                              builder: (context) => AddCropVariety(
+                                cropName: cropName,
+                              ),
                             ),
                           );
                         },
@@ -264,7 +271,7 @@ class AddPlanting extends StatelessWidget {
                                 border: OutlineInputBorder(),
                               ),
                               isExpanded: false,
-                              value: fieldName,
+                              value: fieldNameNotifier.value,
                               items: snapshot.data?.docs.map((value) {
                                 return DropdownMenuItem(
                                   value: value.get('name'),
@@ -278,8 +285,7 @@ class AddPlanting extends StatelessWidget {
                                 return null;
                               },
                               onChanged: (value) {
-                                // debugPrint('selected onchange: $value');
-                                fieldName = value.toString();
+                                fieldNameNotifier.value = value.toString();
                               },
                             );
                           },
@@ -308,6 +314,51 @@ class AddPlanting extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 30),
+                // Use ValueListenableBuilder to show second dropdown when a field is selected
+                ValueListenableBuilder<String?>(
+                  valueListenable: fieldNameNotifier,
+                  builder: (context, fieldName, child) {
+                    if (fieldName != null && fieldName.isNotEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child:
+                            ValueListenableBuilder<FieldStatusAfterPlanting?>(
+                          valueListenable: fieldStatusNotifier,
+                          builder: (context, fieldStatus, child) {
+                            return DropdownButtonFormField<
+                                FieldStatusAfterPlanting>(
+                              value: fieldStatus,
+                              decoration: InputDecoration(
+                                labelText:
+                                    'Select field status after Planting *',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: FieldStatusAfterPlanting.values
+                                  .map((option) => DropdownMenuItem<
+                                          FieldStatusAfterPlanting>(
+                                        value: option,
+                                        child: Text(
+                                            option.toString().split('.')[1]),
+                                      ))
+                                  .toList(),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select necessary fields';
+                                }
+                                return null;
+                              },
+                              onChanged: (FieldStatusAfterPlanting? newValue) {
+                                fieldStatusNotifier.value = newValue;
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    }
+                    return SizedBox.shrink(); // Hide when no field is selected
+                  },
                 ),
                 SizedBox(height: 30),
                 TextFormField(
@@ -408,9 +459,13 @@ class AddPlanting extends StatelessWidget {
     References r = References();
     String? id = await r.getLoggedUserId();
     String? cropId = await r.getCropIdByName(cropName);
-    yield* r.usersRef.doc(id).collection("crops").doc(cropId).collection("varieties").snapshots();
+    yield* r.usersRef
+        .doc(id)
+        .collection("crops")
+        .doc(cropId)
+        .collection("varieties")
+        .snapshots();
   }
-
 
   Future<void> _saveForm(BuildContext context) async {
     CropPlanting c = CropPlanting(
@@ -440,7 +495,12 @@ class AddPlanting extends StatelessWidget {
         // crop name k basis per code lena h
         String? cropId = await r.getCropIdByName(cropName);
         if (id != null) {
-          await r.usersRef.doc(id).collection('crops').doc(cropId).collection("plantings").add(
+          await r.usersRef
+              .doc(id)
+              .collection('crops')
+              .doc(cropId)
+              .collection("plantings")
+              .add(
                 c.getCropPlantingDataMap(),
               );
           print("Success: Planting added successfully.");
@@ -453,5 +513,4 @@ class AddPlanting extends StatelessWidget {
       }
     }
   }
-
 }

@@ -222,7 +222,7 @@ Future<List<DocumentSnapshot>> getAllPlantings() async {
   List<DocumentSnapshot> allPlantings = [];
 
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-    // Get all the plantings in the subcollection for each crop
+    // Get all the plantings in the collection for each crop
     QuerySnapshot plantingsSnapshot =
     await cropDoc.reference.collection("plantings").get();
 
@@ -242,7 +242,7 @@ Future<List<DocumentSnapshot>> getAllHarvests() async {
   List<DocumentSnapshot> allHarvests= [];
 
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-    // Get all the plantings in the subcollection for each crop
+    // Get all the plantings in the collection for each crop
     QuerySnapshot plantingsSnapshot =
     await cropDoc.reference.collection("plantings").get();
 
@@ -273,7 +273,7 @@ Future<List<DocumentSnapshot>> getAllIncomeTransactions() async {
     }
   }
 
-  // Filter transactions in the crops' transactions subcollections
+  // Filter transactions in the crops' transactions collections
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
     QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
 
@@ -289,7 +289,7 @@ Future<List<DocumentSnapshot>> getAllIncomeTransactions() async {
     }
   }
 
-  // Filter transactions in the fields' transactions subcollections
+  // Filter transactions in the fields' transactions collections
   for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
     QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
 
@@ -317,7 +317,7 @@ Future<List<DocumentSnapshot>> getAllTreatments() async {
   List<DocumentSnapshot> allTreatments = [];
 
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-    // Get all the plantings in the subcollection for each crop
+    // Get all the plantings in the collection for each crop
     QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
 
     for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
@@ -328,7 +328,7 @@ Future<List<DocumentSnapshot>> getAllTreatments() async {
   }
 
   for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
-    // Get all the plantings in the subcollection for each crop
+    // Get all the plantings in the collection for each crop
     QuerySnapshot treatmentsSnapshot = await fieldDoc.reference.collection("treatments").get();
     allTreatments.addAll(treatmentsSnapshot.docs);
   }
@@ -353,7 +353,7 @@ Future<List<DocumentSnapshot>> getAllExpenseTransactions() async {
     }
   }
 
-  // Filter transactions in the crops' transactions subcollections
+  // Filter transactions in the crops' transactions collections
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
     QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
 
@@ -369,7 +369,7 @@ Future<List<DocumentSnapshot>> getAllExpenseTransactions() async {
     }
   }
 
-  // Filter transactions in the fields' transactions subcollections
+  // Filter transactions in the fields' transactions collections
   for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
     QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
 
@@ -400,7 +400,7 @@ Future<double> getTotalIncomeCost() async {
     }
   }
 
-  // Calculate total cost in the crops' transactions subcollections
+  // Calculate total cost in the crops' transactions collections
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
     QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
 
@@ -416,7 +416,7 @@ Future<double> getTotalIncomeCost() async {
     }
   }
 
-  // Calculate total cost in the fields' transactions subcollections
+  // Calculate total cost in the fields' transactions collections
   for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
     QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
 
@@ -464,7 +464,7 @@ Future<double> getTotalExpenseCost() async {
     }
   }
 
-  // Sum expenses from the crops' transactions subcollections
+  // Sum expenses from the crops' transactions collections
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
     QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
 
@@ -480,7 +480,7 @@ Future<double> getTotalExpenseCost() async {
     }
   }
 
-  // Sum expenses from the fields' transactions subcollections
+  // Sum expenses from the fields' transactions collection
   for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
     QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
 
@@ -529,7 +529,7 @@ Stream<QuerySnapshot> getAllPlantingsStream() async* {
   QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
 
   for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-    // Listen to real-time updates for the plantings in each crop's subcollection
+    // Listen to real-time updates for the plantings in each crop's collection
     yield* cropDoc.reference.collection("plantings").snapshots();
   }
 }
