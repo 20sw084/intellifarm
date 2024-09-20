@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intellifarm/screens/reports_screens/transactions_screens/data_summary_screen.dart';
-import 'dart:math' as math;
-
 import '../../../external_libs/appbar_dropdown/appbar_dropdown.dart';
 import '../../../external_libs/pie_chart/src/chart_values_options.dart';
 import '../../../external_libs/pie_chart/src/legend_options.dart';
 import '../../../external_libs/pie_chart/src/pie_chart.dart';
+import 'dart:math' as math;
+
+import '../../../util/common_methods.dart';
 
 class TransactionsReportScreen extends StatefulWidget {
   const TransactionsReportScreen({super.key});
@@ -20,10 +21,29 @@ enum LegendShape { circle, rectangle }
 String isCheckboxChecked = "Last 7 days";
 
 class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
-  final dataMap = <String, double>{
-    "Income": 6,
-    "Expense": 4,
-  };
+  // Async method to get income and expense data
+  Future<Map<String, double>> getDataMap() async {
+    double income = await getTotalIncomeCost(); // Fetch the total income cost
+    double expense = await getTotalExpenseCost(); // Fetch the total expense cost
+    // double total = income + expense;
+    //
+    // // Avoid division by zero
+    // if (total == 0) {
+    //   return {
+    //     "Income": 0,
+    //     "Expense": 0,
+    //   };
+    // }
+    //
+    // // Calculate percentages
+    // double incomePercentage = (income / total) * 100;
+    // double expensePercentage = (expense / total) * 100;
+    return {
+      "Income": income,
+      "Expense": expense,
+    };
+  }
+
 
   final legendLabels = <String, String>{
     "Income": "Income legend",
@@ -76,46 +96,46 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chart = PieChart(
-      key: ValueKey(key),
-      dataMap: dataMap,
-      animationDuration: const Duration(milliseconds: 800),
-      chartLegendSpacing: _chartLegendSpacing!,
-      chartRadius: math.min(MediaQuery.of(context).size.width / 3.2, 300),
-      colorList: colorList,
-      initialAngleInDegree: 0,
-      chartType: _chartType!,
-      centerText: _showCenterText ? "HYBRID" : null,
-      centerWidget: _showCenterWidget
-          ? Container(color: Colors.red, child: const Text("Center"))
-          : null,
-      legendLabels: _showLegendLabel ? legendLabels : {},
-      legendOptions: LegendOptions(
-        showLegendsInRow: _showLegendsInRow,
-        legendPosition: _legendPosition!,
-        showLegends: _showLegends,
-        legendShape: _legendShape == LegendShape.circle
-            ? BoxShape.circle
-            : BoxShape.rectangle,
-        legendTextStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      chartValuesOptions: ChartValuesOptions(
-        showChartValueBackground: _showChartValueBackground,
-        showChartValues: _showChartValues,
-        showChartValuesInPercentage: _showChartValuesInPercentage,
-        showChartValuesOutside: _showChartValuesOutside,
-      ),
-      ringStrokeWidth: _ringStrokeWidth!,
-      emptyColor: Colors.grey,
-      gradientList: _showGradientColors ? gradientList : null,
-      emptyColorGradient: const [
-        Color(0xff6c5ce7),
-        Colors.blue,
-      ],
-      baseChartColor: Colors.transparent,
-    );
+    // final chart = PieChart(
+    //   key: ValueKey(key),
+    //   dataMap: dataMap,
+    //   animationDuration: const Duration(milliseconds: 800),
+    //   chartLegendSpacing: _chartLegendSpacing!,
+    //   chartRadius: math.min(MediaQuery.of(context).size.width / 3.2, 300),
+    //   colorList: colorList,
+    //   initialAngleInDegree: 0,
+    //   chartType: _chartType!,
+    //   centerText: _showCenterText ? "HYBRID" : null,
+    //   centerWidget: _showCenterWidget
+    //       ? Container(color: Colors.red, child: const Text("Center"))
+    //       : null,
+    //   legendLabels: _showLegendLabel ? legendLabels : {},
+    //   legendOptions: LegendOptions(
+    //     showLegendsInRow: _showLegendsInRow,
+    //     legendPosition: _legendPosition!,
+    //     showLegends: _showLegends,
+    //     legendShape: _legendShape == LegendShape.circle
+    //         ? BoxShape.circle
+    //         : BoxShape.rectangle,
+    //     legendTextStyle: const TextStyle(
+    //       fontWeight: FontWeight.bold,
+    //     ),
+    //   ),
+    //   chartValuesOptions: ChartValuesOptions(
+    //     showChartValueBackground: _showChartValueBackground,
+    //     showChartValues: _showChartValues,
+    //     showChartValuesInPercentage: _showChartValuesInPercentage,
+    //     showChartValuesOutside: _showChartValuesOutside,
+    //   ),
+    //   ringStrokeWidth: _ringStrokeWidth!,
+    //   emptyColor: Colors.grey,
+    //   gradientList: _showGradientColors ? gradientList : null,
+    //   emptyColorGradient: const [
+    //     Color(0xff6c5ce7),
+    //     Colors.blue,
+    //   ],
+    //   baseChartColor: Colors.transparent,
+    // );
     final settings = SingleChildScrollView(
       child: Card(
         margin: const EdgeInsets.all(12),
@@ -428,8 +448,8 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                     onTap: () {
                       isCheckboxChecked = "Previous Month";
                     },
-                    child: Text('Previous Month'),
                     value: 3,
+                    child: Text('Previous Month'),
                   ),
                   CheckedPopupMenuItem(
                     checked: (isCheckboxChecked.compareTo("Last 3 Months") == 0)
@@ -574,7 +594,7 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                 child: TextButton(
                   onPressed: () {},
                   child: Row(
-                    children: [
+                    children: const [
                       Icon(Icons.abc),
                       SizedBox(
                         width: 10,
@@ -590,10 +610,14 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                 color: Colors.greenAccent,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DataSummaryScreen(),));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DataSummaryScreen(),
+                        ));
                   },
                   child: Row(
-                    children: [
+                    children: const [
                       Icon(Icons.abc),
                       SizedBox(
                         width: 10,
@@ -612,8 +636,8 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
               top: 8.0,
             ),
             child: Align(
-              child: Text("Last 12 Months"),
               alignment: Alignment.topLeft,
+              child: Text("Last 12 Months"),
             ),
           ),
           Padding(
@@ -623,77 +647,101 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
               bottom: 8.0,
             ),
             child: Align(
-              child: Text("(June 23 2023 - June 23 2024)"),
               alignment: Alignment.topLeft,
+              child: Text("(June 23 2023 - June 23 2024)"),
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: PieChart(
-              dataMap: dataMap,
-              chartType: ChartType.ring,
-              baseChartColor: Colors.grey[50]!.withOpacity(0.15),
-              colorList: colorList,
-              chartValuesOptions: const ChartValuesOptions(
-                showChartValuesInPercentage: true,
-              ),
-              totalValue: 10,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 30.0,
-              right: 30.0,
-              top: 8.0,
-            ),
-            child: Align(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Total Income:"),
-                  Text("56,000 PKR"),
-                ],
-              ),
-              alignment: Alignment.topLeft,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 30.0,
-              right: 30.0,
-              top: 8.0,
-            ),
-            child: Align(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Total Expense:"),
-                  Text("39,000 PKR"),
-                ],
-              ),
-              alignment: Alignment.topLeft,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 30.0,
-              right: 30.0,
-              top: 8.0,
-            ),
-            child: Align(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Net:"),
-                  Text("17,000 PKR"),
-                ],
-              ),
-              alignment: Alignment.topLeft,
-            ),
-          ),
-          Divider(
+            child: FutureBuilder<Map<String, double>>(
+              future: getDataMap(), // Fetch data asynchronously (Income and Expense)
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator()); // Loading indicator
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}')); // Handle errors
+                } else if (snapshot.hasData) {
+                  // Once the data is available, display the PieChart and other widgets
+                  final dataMap = snapshot.data!;
+                  final income = dataMap['Income']!;
+                  final expense = dataMap['Expense']!;
+                  final net = income - expense; // Calculate net cost dynamically
 
+                  double total = income + expense;
+
+                  // Calculate percentages
+                  double incomePercentage = (income / total) * 100;
+                  double expensePercentage = (expense / total) * 100;
+
+                  final map = {
+                    "Income": incomePercentage,
+                    "Expense": expensePercentage,
+                  };
+
+                  return Column(
+                    children: [
+                      // Pie Chart
+                      PieChart(
+                        dataMap: map,
+                        chartType: ChartType.ring,
+                        baseChartColor: Colors.grey[50]!.withOpacity(0.15),
+                        colorList: colorList,
+                        chartValuesOptions: const ChartValuesOptions(
+                          showChartValuesInPercentage: true,
+                        ),
+                        totalValue: incomePercentage + expensePercentage, // Set total as the sum of income and expense
+                      ),
+                      // Income Text
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Total Income:"),
+                              Text("${income.toStringAsFixed(2)} PKR"), // Display the fetched income
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Expense Text
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Total Expense:"),
+                              Text("${expense.toStringAsFixed(2)} PKR"), // Display the fetched expense
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Net Text
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Net:"),
+                              Text("${net.toStringAsFixed(2)} PKR"), // Display the calculated net
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return const Center(child: Text("No data available")); // No data scenario
+                }
+              },
+            ),
           ),
+          Divider(),
         ],
       ),
     );

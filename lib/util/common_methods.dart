@@ -383,6 +383,117 @@ Future<List<DocumentSnapshot>> getAllExpenseTransactions() async {
   return expenseTransactions;
 }
 
+Future<double> getTotalIncomeCost() async {
+  References r = References();
+  String? id = await r.getLoggedUserId();
+  String typeOfIncome = "TypeOfIncome"; // Replace this with the actual income type identifier
+  QuerySnapshot transSnapshot = await r.usersRef.doc(id).collection("transactions").get();
+  QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
+  QuerySnapshot fieldsSnapshot = await r.usersRef.doc(id).collection("fields").get();
+
+  double totalIncomeCost = 0.0;
+
+  // Calculate total cost in the main transactions collection
+  for (QueryDocumentSnapshot transDoc in transSnapshot.docs) {
+    if (transDoc['typeOfTransaction'].toString().startsWith(typeOfIncome)) {
+      totalIncomeCost += transDoc['earningAmount']; // Assuming the field 'amount' holds the transaction cost
+    }
+  }
+
+  // Calculate total cost in the crops' transactions subcollections
+  for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
+    QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
+
+    for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
+      QuerySnapshot transactionsSnapshot =
+      await plantingDoc.reference.collection("transactions").get();
+
+      for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+        if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfIncome)) {
+          totalIncomeCost += transactionDoc['earningAmount']; // Add to total cost
+        }
+      }
+    }
+  }
+
+  // Calculate total cost in the fields' transactions subcollections
+  for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
+    QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
+
+    for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+      if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfIncome)) {
+        totalIncomeCost += transactionDoc['earningAmount']; // Add to total cost
+      }
+    }
+  }
+
+  for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
+    QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
+
+    for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
+      QuerySnapshot harvestsSnapshot = await plantingDoc.reference.collection("harvests").get();
+      for (QueryDocumentSnapshot harvestDoc in harvestsSnapshot.docs) {
+        if (harvestDoc['incomeFromThisHarvest'] == null) {
+          totalIncomeCost += (harvestDoc['quantityHarvested'] - harvestDoc['quantityRejected']) * harvestDoc['unitCost'];
+        }
+        else {
+          totalIncomeCost += harvestDoc['incomeFromThisHarvest'];
+        }
+      }
+    }
+  }
+
+  return totalIncomeCost;
+}
+
+Future<double> getTotalExpenseCost() async {
+  References r = References();
+  String? id = await r.getLoggedUserId();
+  String typeOfExpense = "TypeOfExpense"; // Replace this with the actual expense type identifier
+  double totalExpenseCost = 0.0;
+
+  // Fetch the main transactions, crops, and fields collections
+  QuerySnapshot transSnapshot = await r.usersRef.doc(id).collection("transactions").get();
+  QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
+  QuerySnapshot fieldsSnapshot = await r.usersRef.doc(id).collection("fields").get();
+
+  // Sum expenses from the main transactions collection
+  for (QueryDocumentSnapshot transDoc in transSnapshot.docs) {
+    if (transDoc['typeOfTransaction'].toString().startsWith(typeOfExpense)) {
+      totalExpenseCost += transDoc['earningAmount']; // Assuming 'amount' field contains the expense value
+    }
+  }
+
+  // Sum expenses from the crops' transactions subcollections
+  for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
+    QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
+
+    for (QueryDocumentSnapshot plantingDoc in plantingsSnapshot.docs) {
+      QuerySnapshot transactionsSnapshot =
+      await plantingDoc.reference.collection("transactions").get();
+
+      for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+        if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfExpense)) {
+          totalExpenseCost += transactionDoc['earningAmount']; // Sum the expense amounts
+        }
+      }
+    }
+  }
+
+  // Sum expenses from the fields' transactions subcollections
+  for (QueryDocumentSnapshot fieldDoc in fieldsSnapshot.docs) {
+    QuerySnapshot transactionsSnapshot = await fieldDoc.reference.collection("transactions").get();
+
+    for (QueryDocumentSnapshot transactionDoc in transactionsSnapshot.docs) {
+      if (transactionDoc['typeOfTransaction'].toString().startsWith(typeOfExpense)) {
+        totalExpenseCost += transactionDoc['earningAmount']; // Sum the expense amounts
+      }
+    }
+  }
+
+  return totalExpenseCost; // Return the total expense cost
+}
+
 Future<List<DocumentSnapshot>> getAllTasks() async {
   References r = References();
   String? id = await r.getLoggedUserId();
