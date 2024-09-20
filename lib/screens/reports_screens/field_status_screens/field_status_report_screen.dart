@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/util/common_methods.dart';
 import 'dart:math' as math;
+import '../../../controller/references.dart';
 import '../../../external_libs/appbar_dropdown/appbar_dropdown.dart';
 import '../../../external_libs/pie_chart/src/chart_values_options.dart';
 import '../../../external_libs/pie_chart/src/legend_options.dart';
@@ -20,16 +21,20 @@ enum LegendShape { circle, rectangle }
 
 class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
 
-  final dataMap = <String, double>{
+  var dataMap = <String, double>{
     "Available": 4,
-    "Cultivated": 3,
-    "Partially Cultivated": 3,
+    "FullyCultivated": 3,
+    "PartiallyCultivated": 3,
   };
+
+  Future<Map<String, double>> populateDataMap() async {
+    return await getFieldStatusCount();  // This function returns the field status counts
+  }
 
   final legendLabels = <String, String>{
     "Available": "Available",
-    "Cultivated": "Cultivated",
-    "Partially Cultivated": "Partially Cultivated",
+    "FullyCultivated": "FullyCultivated",
+    "PartiallyCultivated": "PartiallyCultivated",
   };
 
   final colorList = <Color>[
@@ -439,18 +444,31 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
             SizedBox(
               height: 15,
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PieChart(
-                dataMap: dataMap,
-                chartType: ChartType.ring,
-                baseChartColor: Colors.grey[50]!.withOpacity(0.15),
-                colorList: colorList,
-                chartValuesOptions: const ChartValuesOptions(
-                  showChartValuesInPercentage: true,
-                ),
-                totalValue: 10,
-              ),
+            FutureBuilder<Map<String, double>>(
+              future: populateDataMap(), // The function that returns the field status counts
+              builder: (BuildContext context, AsyncSnapshot<Map<String, double>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error is: ${snapshot.error}"));
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  final dataMap = snapshot.data!;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: PieChart(
+                      dataMap: dataMap, // Use the dataMap from the Future
+                      chartType: ChartType.ring,
+                      baseChartColor: Colors.grey[50]!.withOpacity(0.15),
+                      colorList: colorList,
+                      chartValuesOptions: const ChartValuesOptions(
+                        showChartValuesInPercentage: true,
+                      ),
+                    ),
+                  );
+                } else {
+                  return const Center(child: Text("No Pie Chart available"));
+                }
+              },
             ),
             SizedBox(
               height: 15,
@@ -651,6 +669,45 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
       ),
     );
   }
+
+  Future<Map<String, double>> getFieldStatusCount() async {
+    References r = References();
+    String? userId = await r.getLoggedUserId();
+
+    if (userId == null) {
+      throw Exception("User not logged in");
+    }
+
+    // Fetch all the field documents from Firestore
+    QuerySnapshot fieldSnapshot = await r.usersRef.doc(userId).collection("fields").get();
+
+    // Initialize counters for the field statuses
+    int availableCount = 0;
+    int cultivatedCount = 0;
+    int partiallyCultivatedCount = 0;
+
+    // Iterate over each document and check its 'fieldStatus'
+    for (var fieldDoc in fieldSnapshot.docs) {
+      String fieldStatus = fieldDoc.get('fieldStatus');
+
+      // Increment counters based on fieldStatus
+      if (fieldStatus == "Available") {
+        availableCount++;
+      } else if (fieldStatus == "FullyCultivated") {
+        cultivatedCount++;
+      } else if (fieldStatus == "PartiallyCultivated") {
+        partiallyCultivatedCount++;
+      }
+    }
+
+    // Return the data as a map
+    return {
+      "Available": availableCount.toDouble(),
+      "FullyCultivated": cultivatedCount.toDouble(),
+      "PartiallyCultivated": partiallyCultivatedCount.toDouble(),
+    };
+  }
+
 }
 
 class TestData {

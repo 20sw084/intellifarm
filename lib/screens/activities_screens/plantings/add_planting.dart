@@ -286,6 +286,7 @@ class AddPlanting extends StatelessWidget {
                               },
                               onChanged: (value) {
                                 fieldNameNotifier.value = value.toString();
+                                fieldName = value.toString();
                               },
                             );
                           },
@@ -503,6 +504,16 @@ class AddPlanting extends StatelessWidget {
               .add(
                 c.getCropPlantingDataMap(),
               );
+
+          String? fieldId = await r.getFieldIdByName(c.fieldName!);
+          await r.usersRef
+              .doc(id)
+              .collection('fields')
+              .doc(fieldId)
+              .update(
+            {"fieldStatus" : fieldStatusNotifier.value.toString().split(".").last,}
+          );
+
           print("Success: Planting added successfully.");
           Navigator.pop(context);
         } else {
@@ -514,3 +525,5 @@ class AddPlanting extends StatelessWidget {
     }
   }
 }
+
+// TODO: fields 2bara na aaen jab fully cultivate wala scene hojaye. y check khan lagana h dekhlena : app se dekho pehle

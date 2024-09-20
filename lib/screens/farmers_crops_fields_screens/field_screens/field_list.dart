@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/screens/farmers_crops_fields_screens/field_screens/view_field_details.dart';
+import 'package:intellifarm/util/common_methods.dart';
 import '../../../controller/references.dart';
 import '../../../widgets/list_details_cart_field.dart';
 import 'add_field_record.dart';
@@ -121,9 +122,9 @@ class _FieldListState extends State<FieldList> {
                           return ListDetailsCardField(
                             dataMap: {
                               "Name:": data['name'].toString(),
-                              "Field Type:": data['fieldType'].toString(),
-                              "Light Profile:": data['lightProfile'].toString(),
-                              "Field Status:": data['fieldStatus'].toString(),
+                              "Field Type:": data['fieldType'],
+                              "Light Profile:": data['lightProfile'],
+                              "Field Status:": data['fieldStatus']  ,
                               "Size of Field:": data['sizeOfField'].toString(),
                               "Notes:": data['notes'].toString(),
                               "Plantings:": plantingsCount.toString(),

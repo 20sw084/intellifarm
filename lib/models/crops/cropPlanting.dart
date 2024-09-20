@@ -35,7 +35,7 @@ class CropPlanting {
   Map<String, dynamic> getCropPlantingDataMap() {
     return {
       "plantingDate": plantingDate,
-      "plantingType": plantingType.toString(),
+      "plantingType": plantingType.toString().split(".").last,
       "cropName": cropName,
       "varietyName": varietyName,
       "fieldName" : fieldName,

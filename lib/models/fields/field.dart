@@ -13,9 +13,9 @@ class Field {
   Map<String, dynamic> getFieldDataMap() {
     return {
       "name": name,
-      "fieldType": fieldType.toString(),
-      "lightProfile": lightProfile.toString(),
-      "fieldStatus": fieldStatus.toString(),
+      "fieldType": fieldType.toString().split('.').last,
+      "lightProfile": lightProfile.toString().split('.').last,
+      "fieldStatus": fieldStatus.toString().split('.').last,
       "sizeOfField": sizeOfField ?? " ",
       "notes": notes ?? " ",
     };

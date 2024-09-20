@@ -45,7 +45,6 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
   DateTime? _selectedPlantingDate;
   DateTime? _selectedHarvestingDate;
 
-
   Future<void> _selectPlantingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -344,6 +343,7 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
                   },
                   onChanged: (FieldStatusAfterPlanting? newValue) {
                     // Do something with the selected value
+                    _fieldStatusAfterPlantingController = newValue;
                   },
                 ),
                 SizedBox(height: 30),
@@ -466,6 +466,14 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
         if (id != null) {
           await r.usersRef.doc(id).collection('crops').doc(cropId).collection("plantings").add(
             c.getCropPlantingDataMap(),
+          );
+          String? fieldId = await r.getFieldIdByName(c.fieldName!);
+          await r.usersRef
+              .doc(id)
+              .collection('fields')
+              .doc(fieldId)
+              .update(
+              {"fieldStatus" : _fieldStatusAfterPlantingController.toString().split(".").last,}
           );
           print("Success: Planting added successfully.");
           Navigator.pop(context);

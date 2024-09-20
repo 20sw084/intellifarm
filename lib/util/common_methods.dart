@@ -131,24 +131,24 @@ TransactionSpecificToField transactionSpecificToFieldFromString(String type) {
 
 PlantingType plantingTypeFromString(String type) {
   switch (type) {
-    case 'PlantingType.Planted':
+    case 'Planted':
       return PlantingType.Planted;
-    case 'PlantingType.Harvested':
+    case 'Harvested':
       return PlantingType.Harvested;
     default:
-      throw Exception('Unknown field type');
+      throw Exception('Unknown Planting type');
   }
 }
 
 FieldType fieldTypeFromString(String type) {
   switch (type) {
-    case 'FieldType.FieldOrOutdoor':
+    case 'FieldOrOutdoor':
       return FieldType.FieldOrOutdoor;
-    case 'FieldType.Greenhouse':
+    case 'Greenhouse':
       return FieldType.Greenhouse;
-    case 'FieldType.SpeedlingGrowTent':
+    case 'SpeedlingGrowTent':
       return FieldType.SpeedlingGrowTent;
-    case 'FieldType.GrowTent':
+    case 'GrowTent':
       return FieldType.GrowTent;
     default:
       throw Exception('Unknown field type');
@@ -156,11 +156,11 @@ FieldType fieldTypeFromString(String type) {
 }
 FieldStatus fieldStatusFromString(String type) {
   switch (type) {
-    case 'FieldStatus.Available':
+    case 'Available':
       return FieldStatus.Available;
-    case 'FieldStatus.PartiallyCultivated':
+    case 'PartiallyCultivated':
       return FieldStatus.PartiallyCultivated;
-    case 'FieldStatus.FullyCultivated':
+    case 'FullyCultivated':
       return FieldStatus.FullyCultivated;
     default:
       throw Exception('Unknown field type');
@@ -168,15 +168,15 @@ FieldStatus fieldStatusFromString(String type) {
 }
 LightProfile lightProfileFromString(String type) {
   switch (type) {
-    case 'LightProfile.FullSun':
+    case 'FullSun':
       return LightProfile.FullSun;
-    case 'LightProfile.FullToPartialSun':
+    case 'FullToPartialSun':
       return LightProfile.FullToPartialSun;
-    case 'LightProfile.PartialSun':
+    case 'PartialSun':
       return LightProfile.PartialSun;
-    case 'LightProfile.PartialShade':
+    case 'PartialShade':
       return LightProfile.PartialShade;
-    case 'LightProfile.FullShade':
+    case 'FullShade':
       return LightProfile.FullShade;
     default:
       throw Exception('Unknown field type');
