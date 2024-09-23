@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intellifarm/screens/reports_screens/tasks_screens/tasks_report_pdf.dart';
 import '../../../external_libs/appbar_dropdown/appbar_dropdown.dart';
 import '../../../models/task.dart';
 import '../../../util/common_methods.dart';
@@ -15,6 +16,8 @@ enum LegendShape { circle, rectangle }
 
 String isCheckboxChecked = "Last 7 days";
 
+List<DocumentSnapshot> reportData = [];
+
 class _TasksReportScreenState extends State<TasksReportScreen> {
   @override
   Widget build(BuildContext context) {
@@ -23,7 +26,14 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
         backgroundColor: Colors.greenAccent,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () async {
+              final TasksReportPdf reportGenerator = TasksReportPdf();
+              final pdfBytes = await reportGenerator.generateReport(reportData);
+              final path = await reportGenerator.savePdf(pdfBytes, 'tasks_report');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('PDF saved at $path')),
+              );
+            },
             icon: Icon(Icons.print),
           ),
           IconButton(
@@ -296,6 +306,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                 return Center(child: Text("Error is: ${snapshot.error}"));
               } else if (snapshot.hasData) {
                 List<DocumentSnapshot> tasks = snapshot.data!;
+                reportData = tasks;
                 return Expanded(
                   child: ListView.builder(
                     itemCount: tasks.length,

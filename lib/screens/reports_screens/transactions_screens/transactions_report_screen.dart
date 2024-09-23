@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intellifarm/screens/reports_screens/transactions_screens/data_summary_screen.dart';
+import 'package:intellifarm/screens/reports_screens/transactions_screens/transactions_report_pdf.dart';
 import '../../../external_libs/appbar_dropdown/appbar_dropdown.dart';
 import '../../../external_libs/pie_chart/src/chart_values_options.dart';
 import '../../../external_libs/pie_chart/src/pie_chart.dart';
@@ -17,24 +18,12 @@ enum LegendShape { circle, rectangle }
 
 String isCheckboxChecked = "Last 7 days";
 
+List<Map<String,dynamic>> reportData = [];
+
 class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
-  // Async method to get income and expense data
   Future<Map<String, double>> getDataMap() async {
-    double income = await getTotalIncomeCost(); // Fetch the total income cost
-    double expense = await getTotalExpenseCost(); // Fetch the total expense cost
-    // double total = income + expense;
-    //
-    // // Avoid division by zero
-    // if (total == 0) {
-    //   return {
-    //     "Income": 0,
-    //     "Expense": 0,
-    //   };
-    // }
-    //
-    // // Calculate percentages
-    // double incomePercentage = (income / total) * 100;
-    // double expensePercentage = (expense / total) * 100;
+    double income = await getTotalIncomeCost();
+    double expense = await getTotalExpenseCost();
     return {
       "Income": income,
       "Expense": expense,
@@ -408,7 +397,14 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
         backgroundColor: Colors.greenAccent,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () async {
+              final TransactionsReportPdf reportGenerator = TransactionsReportPdf();
+              final pdfBytes = await reportGenerator.generateReport(reportData);
+              final path = await reportGenerator.savePdf(pdfBytes, 'transactions_report');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('PDF saved at $path')),
+              );
+            },
             icon: Icon(Icons.print),
           ),
           IconButton(
@@ -651,18 +647,19 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: FutureBuilder<Map<String, double>>(
-              future: getDataMap(), // Fetch data asynchronously (Income and Expense)
+              future: getDataMap(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator()); // Loading indicator
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}')); // Handle errors
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
-                  // Once the data is available, display the PieChart and other widgets
                   final dataMap = snapshot.data!;
                   final income = dataMap['Income']!;
                   final expense = dataMap['Expense']!;
                   final net = income - expense; // Calculate net cost dynamically
+
+                  reportData = [dataMap];
 
                   double total = income + expense;
 

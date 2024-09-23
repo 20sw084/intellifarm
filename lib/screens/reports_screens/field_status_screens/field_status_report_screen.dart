@@ -8,6 +8,7 @@ import '../../../external_libs/pie_chart/src/chart_values_options.dart';
 import '../../../external_libs/pie_chart/src/legend_options.dart';
 import '../../../external_libs/pie_chart/src/pie_chart.dart';
 import '../../../models/crops/cropPlanting.dart';
+import 'field_status_report_pdf.dart';
 
 class FieldStatusReportScreen extends StatefulWidget {
   const FieldStatusReportScreen({super.key});
@@ -26,6 +27,8 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
     "FullyCultivated": 3,
     "PartiallyCultivated": 3,
   };
+
+  List<DocumentSnapshot> reportData = [];
 
   Future<Map<String, double>> populateDataMap() async {
     return await getFieldStatusCount();  // This function returns the field status counts
@@ -399,7 +402,14 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
           backgroundColor: Colors.greenAccent,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                final FieldStatusReportPdf reportGenerator = FieldStatusReportPdf();
+                final pdfBytes = await reportGenerator.generateReport(reportData);
+                final path = await reportGenerator.savePdf(pdfBytes, 'crop_planting_report');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('PDF saved at $path')),
+                );
+              },
               icon: Icon(Icons.print),
             ),
           ],
@@ -545,6 +555,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                   return Center(child: Text("Error is: ${snapshot.error}"));
                 } else if (snapshot.hasData) {
                   List<DocumentSnapshot> plantings = snapshot.data!;
+                  reportData = plantings;
                   return Expanded(
                     child: ListView.builder(
                       itemCount: plantings.length,
