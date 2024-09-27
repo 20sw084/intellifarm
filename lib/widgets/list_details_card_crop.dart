@@ -104,29 +104,29 @@ class ListDetailsCardCrop extends StatelessWidget {
                           position: const RelativeRect.fromLTRB(100, 100, 0, 0),
                           items: [
                             const PopupMenuItem(
-                              child: Text('View Details'),
                               value: 1,
+                              child: Text('View Details'),
                             ),
                             const PopupMenuItem(
-                              child: Text('Edit Record'),
                               value: 2,
+                              child: Text('Edit Record'),
                             ),
                             // (keys?.elementAt(1) == "Type:")?
                             const PopupMenuItem(
-                              child: Text('Add Variety'),
                               value: 3,
+                              child: Text('Add Variety'),
                             ),
                             const PopupMenuItem(
-                              child: Text('Add Planting'),
                               value: 4,
+                              child: Text('Add Planting'),
                             ),
                             const PopupMenuItem(
-                              child: Text('Print PDF'),
                               value: 5,
+                              child: Text('Print PDF'),
                             ),
                             const PopupMenuItem(
-                              child: Text('Delete'),
                               value: 6,
+                              child: Text('Delete'),
                             ),
                           ],
                           // Handle the selected menu item

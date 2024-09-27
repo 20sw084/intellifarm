@@ -301,7 +301,7 @@ class _PlantingsScreenState extends State<PlantingsScreen> {
                 cropName = plantingData["cropName"];
                 String plantingId = plantings[index].id;
                 final String plantingDateString =
-                    plantingData['plantingDate'].toString() ?? "2000-01-01";
+                    plantingData['plantingDate'].toString();
                 DateTime plantingDate = parseDateString(plantingDateString);
                 int pdAge = calculateAgeInDays(plantingDate);
                 cr = CropPlanting(

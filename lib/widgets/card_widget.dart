@@ -20,7 +20,7 @@ class CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
+      child: SizedBox(
         width: width,
         height: height,
         child: GestureDetector(

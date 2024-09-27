@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/screens/reports_screens/transactions_screens/data_summary_screen.dart';
 import 'package:intellifarm/screens/reports_screens/transactions_screens/transactions_report_pdf.dart';
@@ -17,8 +18,6 @@ class TransactionsReportScreen extends StatefulWidget {
 enum LegendShape { circle, rectangle }
 
 String isCheckboxChecked = "Last 7 days";
-
-List<Map<String,dynamic>> reportData = [];
 
 class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
   Future<Map<String, double>> getDataMap() async {
@@ -399,7 +398,12 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
           IconButton(
             onPressed: () async {
               final TransactionsReportPdf reportGenerator = TransactionsReportPdf();
-              final pdfBytes = await reportGenerator.generateReport(reportData);
+              List<DocumentSnapshot> incomeTransactions = await getAllIncomeTransactions();
+              List<DocumentSnapshot> expenseTransactions = await getAllExpenseTransactions();
+              List<DocumentSnapshot> trans = [];
+              trans.addAll(incomeTransactions);
+              trans.addAll(expenseTransactions);
+              final pdfBytes = await reportGenerator.generateReport(trans);
               final path = await reportGenerator.savePdf(pdfBytes, 'transactions_report');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('PDF saved at $path')),
@@ -659,8 +663,6 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                   final expense = dataMap['Expense']!;
                   final net = income - expense; // Calculate net cost dynamically
 
-                  reportData = [dataMap];
-
                   double total = income + expense;
 
                   // Calculate percentages
@@ -740,10 +742,4 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
       ),
     );
   }
-}
-
-class TestData {
-  final String title;
-
-  TestData(this.title);
 }

@@ -45,28 +45,28 @@ class ListDetailsCardField extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Column(
-                    children: [
+                    children: const [
                       Text(
                         "Name:",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         "Type:",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         "Size:",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         "Plantings:",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                         ),
                       ),

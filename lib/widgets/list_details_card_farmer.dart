@@ -8,7 +8,7 @@ class ListDetailsCardFarmer extends StatelessWidget {
   final Map<String, dynamic> dataMap;
   final dynamic onTap;
 
-  ListDetailsCardFarmer({
+  const ListDetailsCardFarmer({
     super.key,
     required this.dataMap,
     required this.farmerId,
@@ -37,7 +37,7 @@ class ListDetailsCardFarmer extends StatelessWidget {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                          children: const [
                             Text("Name:", style: TextStyle(fontSize: 13)),
                             Text("Phone Number:",
                                 style: TextStyle(fontSize: 13)),
@@ -72,13 +72,15 @@ class ListDetailsCardFarmer extends StatelessWidget {
                               position: RelativeRect.fromLTRB(100, 100, 0, 0),
                               items: [
                                 PopupMenuItem(
-                                    child: Text('Link with CropPlanting!'),
-                                    value: 1),
+                                    value: 1,
+                                    child: Text('Link with CropPlanting!')),
                                 PopupMenuItem(
-                                    child: Text('Edit Record'), value: 2),
+                                    value: 2,
+                                    child: Text('Edit Record')),
                                 PopupMenuItem(
-                                    child: Text('Print PDF'), value: 3),
-                                PopupMenuItem(child: Text('Delete'), value: 4),
+                                    value: 3,
+                                    child: Text('Print PDF')),
+                                PopupMenuItem(value: 4, child: Text('Delete')),
                               ],
                               elevation: 8.0,
                             ).then((value) async {
