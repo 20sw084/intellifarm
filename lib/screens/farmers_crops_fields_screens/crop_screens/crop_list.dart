@@ -112,8 +112,8 @@ class _CropListState extends State<CropList> {
                     var data = documents[index].data() as Map<String, dynamic>;
                     return ListDetailsCardCrop(
                       dataMap: {
-                        "Name:" : data['name'].toString(),
-                        "Harvest Unit:" : data['harvestUnit'].toString(),
+                        "Name:" : data['name'].toString().split(".").last,
+                        "Harvest Unit:" : data['harvestUnit'].toString().split(".").last,
                         "Varieties:" : varietiesCountList[index].toString(),
                         "Plantings:" : plantingsCountList[index].toString(),
                         "Notes:" : data['notes'].toString(),

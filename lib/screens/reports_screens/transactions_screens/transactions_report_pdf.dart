@@ -7,7 +7,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 class TransactionsReportPdf {
-  Future<Uint8List> generateReport(List<DocumentSnapshot> reportData) async {
+  Future<Uint8List> generateReport(List<DocumentSnapshot> reportDataIncome, List<DocumentSnapshot> reportDataExpense) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -22,6 +22,10 @@ class TransactionsReportPdf {
               pw.SizedBox(height: 16),
               pw.Text('Generated on: ${DateTime.now()}'),
               pw.SizedBox(height: 16),
+              pw.Text('Income:',
+                  style: pw.TextStyle(
+                      fontSize: 20, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 16),
               TableHelper.fromTextArray(
                 headers: [
                   'Customer Name',
@@ -34,7 +38,42 @@ class TransactionsReportPdf {
                   "Planting Name Transaction",
                   "Notes",
                 ],
-                data: reportData.map((DocumentSnapshot doc) {
+                data: reportDataIncome.map((DocumentSnapshot doc) {
+                  var data = doc.data() as Map<String,
+                      dynamic>; // Extract data from DocumentSnapshot
+                  return [
+                    data['customerName'],
+                    data['earningAmount'],
+                    data['transactionDate'],
+                    data['receiptNumber'],
+                    data['typeOfTransaction'],
+                    data['transactionTypeOther'],
+                    // data['transactionSpecificToField'],
+                    data['fieldName'],
+                    // data['transactionSpecificToPlanting'],
+                    data['plantingNameTransaction'],
+                    data['notes'],
+                  ];
+                }).toList(),
+              ),
+              pw.SizedBox(height: 16),
+              pw.Text('Expense:',
+                  style: pw.TextStyle(
+                      fontSize: 20, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 16),
+              TableHelper.fromTextArray(
+                headers: [
+                  'Customer Name',
+                  'Amount',
+                  'Transaction Date',
+                  "Receipt Number",
+                  "Type Of Transaction",
+                  "Transaction Type Other",
+                  "Field Name",
+                  "Planting Name Transaction",
+                  "Notes",
+                ],
+                data: reportDataExpense.map((DocumentSnapshot doc) {
                   var data = doc.data() as Map<String,
                       dynamic>; // Extract data from DocumentSnapshot
                   return [

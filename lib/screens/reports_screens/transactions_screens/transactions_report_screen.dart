@@ -400,10 +400,7 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
               final TransactionsReportPdf reportGenerator = TransactionsReportPdf();
               List<DocumentSnapshot> incomeTransactions = await getAllIncomeTransactions();
               List<DocumentSnapshot> expenseTransactions = await getAllExpenseTransactions();
-              List<DocumentSnapshot> trans = [];
-              trans.addAll(incomeTransactions);
-              trans.addAll(expenseTransactions);
-              final pdfBytes = await reportGenerator.generateReport(trans);
+              final pdfBytes = await reportGenerator.generateReport(incomeTransactions, expenseTransactions);
               final path = await reportGenerator.savePdf(pdfBytes, 'transactions_report');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('PDF saved at $path')),

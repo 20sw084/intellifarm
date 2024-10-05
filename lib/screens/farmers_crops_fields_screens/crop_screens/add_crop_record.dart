@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intellifarm/controller/references.dart';
 
 import '../../../models/crops/crop.dart';
+import '../../../util/crop_type_enum.dart';
 import '../../../util/units_enum.dart';
 
 class AddCropRecord extends StatelessWidget {
@@ -10,7 +11,7 @@ class AddCropRecord extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
-  final TextEditingController cropNameController = TextEditingController();
+  CropType? _selectedCrop;
   Units harvestUnitController = Units.Kilograms;
   final TextEditingController notesController = TextEditingController();
 
@@ -36,18 +37,29 @@ class AddCropRecord extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 30),
-              TextFormField(
-                controller: cropNameController,
+              DropdownButtonFormField<CropType>(
                 decoration: InputDecoration(
-                  labelText: 'Name of Crop  *',
+                  labelText: 'Select Crop *',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value!.isEmpty) {
+                  if (value == null) {
                     return 'This field is required';
                   }
                   return null;
                 },
+                items: CropType.values
+                    .map((crop) => DropdownMenuItem(
+                  value: crop,
+                  child: Text(crop.name),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  // setState(() {
+                    _selectedCrop = value;
+                  // });
+                },
+                value: _selectedCrop,
               ),
               SizedBox(height: 30),
               DropdownButtonFormField<Units>(
@@ -110,7 +122,7 @@ class AddCropRecord extends StatelessWidget {
       );
 
       Crop c = Crop(
-        name: cropNameController.text,
+        name: _selectedCrop.toString(),
         harvestUnit: harvestUnitController,
         notes: notesController.text,
       );
