@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/screens/farmers_crops_fields_screens/field_screens/view_field_details.dart';
 import 'package:intellifarm/util/common_methods.dart';
+import 'package:provider/provider.dart';
 import '../../../controller/references.dart';
 import '../../../widgets/list_details_cart_field.dart';
 import 'add_field_record.dart';
+import '../../../providers/search_provider.dart'; // Import your search provider
 
 class FieldList extends StatefulWidget {
   const FieldList({super.key});
@@ -14,8 +16,6 @@ class FieldList extends StatefulWidget {
 }
 
 class _FieldListState extends State<FieldList> {
-  bool searchFlag = false;
-  String searchQuery = '';
   final TextEditingController searchController = TextEditingController();
   References r = References();
   List<DocumentSnapshot> matchedPlantingsList = [];
@@ -23,10 +23,9 @@ class _FieldListState extends State<FieldList> {
   @override
   void initState() {
     super.initState();
+    final searchProvider = Provider.of<SearchProvider>(context, listen: false);
     searchController.addListener(() {
-      setState(() {
-        searchQuery = searchController.text;
-      });
+      searchProvider.updateSearchQuery(searchController.text);
     });
   }
 
@@ -38,17 +37,15 @@ class _FieldListState extends State<FieldList> {
 
   @override
   Widget build(BuildContext context) {
+    final searchProvider = Provider.of<SearchProvider>(context);
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.greenAccent,
           actions: [
             IconButton(
-              onPressed: () {
-                setState(() {
-                  searchFlag = !searchFlag;
-                });
-              },
+              onPressed: searchProvider.toggleSearch,
               icon: Icon(Icons.search),
             ),
             IconButton(
@@ -60,7 +57,7 @@ class _FieldListState extends State<FieldList> {
               icon: Icon(Icons.print),
             ),
           ],
-          title: searchFlag
+          title: searchProvider.searchFlag
               ? Container(
             width: double.infinity,
             height: 40,
@@ -75,6 +72,7 @@ class _FieldListState extends State<FieldList> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.clear),
                     onPressed: () {
+                      searchProvider.clearSearch();
                       searchController.clear();
                     },
                   ),
@@ -100,7 +98,7 @@ class _FieldListState extends State<FieldList> {
                     .where((doc) => (doc.data() as Map<String, dynamic>)['name']
                     .toString()
                     .toLowerCase()
-                    .contains(searchQuery.toLowerCase()))
+                    .contains(searchProvider.searchQuery.toLowerCase()))
                     .toList();
 
                 return ListView.builder(
@@ -111,24 +109,21 @@ class _FieldListState extends State<FieldList> {
                       future: getPlantingsCountRelatedToField(data['name'].toString()),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          // Show a loading indicator while waiting for the future to complete
                           return CircularProgressIndicator();
                         } else if (snapshot.hasError) {
-                          // Handle error
                           return Text('Error: ${snapshot.error}');
                         } else {
-                          // When the future completes, use the result
                           int plantingsCount = snapshot.data ?? 0;
                           return ListDetailsCardField(
                             dataMap: {
                               "Name:": data['name'].toString(),
                               "Field Type:": data['fieldType'],
                               "Light Profile:": data['lightProfile'],
-                              "Field Status:": data['fieldStatus']  ,
+                              "Field Status:": data['fieldStatus'],
                               "Size of Field:": data['sizeOfField'].toString(),
                               "Notes:": data['notes'].toString(),
                               "Plantings:": plantingsCount.toString(),
-                              "Plantings List:": matchedPlantingsList, // This list will already be updated
+                              "Plantings List:": matchedPlantingsList,
                             },
                             onTap: () {
                               Navigator.push(
@@ -153,7 +148,6 @@ class _FieldListState extends State<FieldList> {
                         }
                       },
                     );
-
                   },
                 );
               } else {
@@ -182,8 +176,6 @@ class _FieldListState extends State<FieldList> {
     return r.usersRef.doc(id).collection("fields").get();
   }
 
-  // I have to go through all the crops and get their plantings named subcollection. Iterate over all plantings and search for the plantings having fieldName = Given field in parameter and count and return them.
-
   Future<int> getPlantingsCountRelatedToField(String fieldName) async {
     String? id = await r.getLoggedUserId();
     QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
@@ -191,20 +183,15 @@ class _FieldListState extends State<FieldList> {
     int count = 0;
 
     for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-      // Query the plantings subcollection where the field matches the given fieldName
       QuerySnapshot plantingsSnapshot = await cropDoc.reference
           .collection("plantings")
           .where('fieldName', isEqualTo: fieldName)
           .get();
 
-      // Add the count of matching plantings to the list
       count += plantingsSnapshot.size;
-
-      // Add the matched plantings to the external list
       matchedPlantingsList.addAll(plantingsSnapshot.docs);
     }
 
-    // Return the list of counts
     return count;
   }
 }

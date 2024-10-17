@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intellifarm/providers/search_provider.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'wrapper.dart';
 import 'package:connectivity_plus/connectivity_plus.dart'; // For monitoring network status
@@ -17,7 +19,14 @@ Future main() async {
   // Monitor network status
   monitorNetworkStatus();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 // Function to enable offline persistence
