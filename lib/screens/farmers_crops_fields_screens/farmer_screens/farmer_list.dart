@@ -91,6 +91,7 @@ class _FarmersListState extends State<FarmersList> {
                         "Phone Number:" : data['phoneNumber'].toString(),
                         "C-NIC Number:" : data['cnic'].toString(),
                         "Unique Code:" : data['loginCode'].toString(),
+                        "Share Rule:" : data['shareRule'].toString().split(".").last,
                         "Crop Planting Id:" : data['cropPlantingId'],
                       },
                       onTap: () {

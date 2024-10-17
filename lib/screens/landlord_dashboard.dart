@@ -26,15 +26,15 @@ class LandlordDashboard extends StatelessWidget {
           ),
           title: Text("Landlord Dashboard"),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            // Add your onPressed action here
-            print('Button pressed!');
-          },
-          icon: Icon(Icons.refresh),
-          label: Text('Sync Data'),
-          tooltip: 'Sync Data', // Tooltip text
-        ),
+        // floatingActionButton: FloatingActionButton.extended(
+        //   onPressed: () {
+        //     // Add your onPressed action here
+        //     print('Button pressed!');
+        //   },
+        //   icon: Icon(Icons.refresh),
+        //   label: Text('Sync Data'),
+        //   tooltip: 'Sync Data', // Tooltip text
+        // ),
         drawer: Drawer(
           width: MediaQuery.of(context).size.width * 0.6,
           child: Padding(

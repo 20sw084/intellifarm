@@ -185,7 +185,17 @@ class FarmerDashboardState extends State<FarmerDashboard> {
             ),
           ),
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            // Add your onPressed action here
+            print('Button pressed!');
+          },
+          icon: Icon(Icons.refresh),
+          label: Text('Sync Data'),
+          tooltip: 'Sync Data', // Tooltip text
+        ),
       ),
+
     );
   }
 }
@@ -232,15 +242,9 @@ class ViewImageScreen extends StatelessWidget {
         if (type == "Receipt") {
           String storagePath = 'receipts/$farmerId/$imageId.png'; // Define storage path
           final ref = FirebaseStorage.instance.ref().child(storagePath);
-
-          // Upload the image to Firebase Storage
           UploadTask uploadTask = ref.putFile(imageFile);
           TaskSnapshot snapshot = await uploadTask;
-
-          // Step 2: Get the download URL after upload
           String downloadUrl = await snapshot.ref.getDownloadURL();
-
-          // Step 3: Save the download URL in Firestore
           Receipt rec = Receipt(imageURL: downloadUrl, date: DateTime.now().toString());
 
           await r.usersRef
@@ -260,15 +264,10 @@ class ViewImageScreen extends StatelessWidget {
 
           print("Receipt Uploaded Successfully.");
         } else if (type == "Status") {
-          // TODO: I think status is not storing in correct tree. check for it, when there is mobile build.
           String storagePath = 'status/$farmerId/$imageId.png'; // Define storage path
           final ref = FirebaseStorage.instance.ref().child(storagePath);
-
-          // Upload the image to Firebase Storage
           UploadTask uploadTask = ref.putFile(imageFile);
           TaskSnapshot snapshot = await uploadTask;
-
-          // Step 2: Get the download URL after upload
           String downloadUrl = await snapshot.ref.getDownloadURL();
 
           await r.usersRef
@@ -302,3 +301,9 @@ class ViewImageScreen extends StatelessWidget {
     }
   }
 }
+
+
+// Share Rule:
+// Category distribution / making eg: Tractor , Electricity Bills.
+// State:
+// PDF on every page.

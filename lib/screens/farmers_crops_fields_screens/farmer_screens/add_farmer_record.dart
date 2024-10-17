@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intellifarm/controller/references.dart';
 import '../../../models/farmer.dart';
 import '../../../util/common_methods.dart';
+import '../../../util/share_rule_enum.dart';
 
 
 class AddFarmerRecord extends StatelessWidget {
@@ -14,6 +15,7 @@ class AddFarmerRecord extends StatelessWidget {
   // Controllers
   final TextEditingController farmerNameController = TextEditingController();
   final TextEditingController farmerPhoneController = TextEditingController();
+  ShareRule shareRuleController = ShareRule.FiftyPercent;
   final TextEditingController cnicController = TextEditingController();
 
   @override
@@ -68,6 +70,29 @@ class AddFarmerRecord extends StatelessWidget {
                 },
               ),
               SizedBox(height: 30),
+              DropdownButtonFormField<ShareRule>(
+                value: shareRuleController,
+                decoration: InputDecoration(
+                  labelText: 'Select Share Rule *',
+                  border: OutlineInputBorder(),
+                ),
+                items: ShareRule.values
+                    .map((option) => DropdownMenuItem<ShareRule>(
+                  value: option,
+                  child: Text(option.toString().split('.')[1]),
+                ))
+                    .toList(),
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select necessary fields';
+                  }
+                  return null;
+                },
+                onChanged: (ShareRule? newValue) {
+                  shareRuleController = newValue!;
+                },
+              ),
+              SizedBox(height: 30),
               TextFormField(
                 controller: cnicController,
                 decoration: InputDecoration(
@@ -107,6 +132,7 @@ class AddFarmerRecord extends StatelessWidget {
         name: farmerNameController.text,
         phoneNumber: farmerPhoneController.text,
         loginCode: generateRandom10DigitCode(),
+        shareRule: shareRuleController,
         cnic: cnicController.text,
       );
 
@@ -138,6 +164,7 @@ class AddFarmerRecord extends StatelessWidget {
         Navigator.pop(context); // Close the loading dialog
       }
     }
+
   }
 }
 
