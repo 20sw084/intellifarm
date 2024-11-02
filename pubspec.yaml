@@ -24,6 +24,7 @@ dependencies:
   connectivity_plus: ^4.0.0 # Keep its version to 4.0.0 as it was giving errors on newer versions
   provider: ^6.1.2
   path_provider: ^2.1.4
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

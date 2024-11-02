@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/controller/references.dart';
+import 'package:provider/provider.dart';
+import '../providers/farmer_provider.dart';
 import '../util/common_methods.dart';
+import 'confirm_delete_farmer_dialog.dart';
 
 class ListDetailsCardFarmer extends StatelessWidget {
   final String farmerId;
@@ -114,7 +117,6 @@ class ListDetailsCardFarmer extends StatelessWidget {
                             ).then((value) async {
                               switch (value) {
                                 case 1:
-                                  // Show dialog with CircularProgressIndicator while fetching data
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -178,12 +180,8 @@ class ListDetailsCardFarmer extends StatelessWidget {
                                                           title: Text(
                                                               plantingName),
                                                           onTap: () {
-                                                            linkFarmerToCropPlanting(
-                                                                farmerId,
-                                                                planting.id);
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
+                                                            linkFarmerToCropPlanting(context, farmerId, planting.id);
+                                                            Navigator.of(context).pop();
                                                           },
                                                         );
                                                       },
@@ -205,7 +203,16 @@ class ListDetailsCardFarmer extends StatelessWidget {
                                   print('Option 3 selected');
                                   break;
                                 case 4:
-                                  print('Option 4 selected');
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return ConfirmDeleteFarmerDialog(
+                                        onConfirm: () async {
+                                          await _deleteFarmer(context, dataMap["Name:"]);
+                                        },
+                                      );
+                                    },
+                                  );
                                   break;
                               }
                             });
@@ -254,7 +261,17 @@ class ListDetailsCardFarmer extends StatelessWidget {
     return nonLinkedPlantings;
   }
 
-  void linkFarmerToCropPlanting(String farmerId, String cropPlantingId) {
+  Future<void> _deleteFarmer(BuildContext context, String farmerName) async {
+    try {
+      final farmerProvider = Provider.of<FarmerProvider>(context, listen: false);
+      await farmerProvider.deleteFarmer(farmerName);
+      farmerProvider.needsRefresh = true;
+    } catch (e) {
+      print('Error deleting field: $e');
+    }
+  }
+
+  void linkFarmerToCropPlanting(BuildContext context, String farmerId, String cropPlantingId) {
     FirebaseFirestore.instance.collection('farmers').doc(farmerId).update({
       'cropPlantingId': cropPlantingId,
     }).then((_) async {
@@ -269,6 +286,7 @@ class ListDetailsCardFarmer extends StatelessWidget {
         'cropPlantingId': cropPlantingId,
       }).then((_) {
         print("Farmer linked to crop planting successfully!");
+        Provider.of<FarmerProvider>(context, listen: false).needsRefresh = true;
       }).catchError((error) {
         print("Failed to link farmer: $error");
       });

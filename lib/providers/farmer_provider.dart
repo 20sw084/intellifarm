@@ -19,6 +19,23 @@ class FarmerProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteFarmer(String farmerName) async {
+    try {
+      References r = References();
+      String? id = await r.getLoggedUserId();
+      QuerySnapshot querySnapshot = await r.usersRef.doc(id).collection("farmers").where("name", isEqualTo: farmerName).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        String farmerId = querySnapshot.docs.first.id;
+        await r.usersRef.doc(id).collection("farmers").doc(farmerId).delete();
+        _farmers.removeWhere((farmer) => farmer.id == farmerId);
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchFarmersData() async {
     try {
       References r = References();

@@ -1,13 +1,17 @@
 // lib/screens/farmers_crops_fields_screens/farmer_screens/farmer_list.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intellifarm/providers/farmer_provider.dart';
 import '../../../providers/search_provider.dart';
 import '../../../widgets/list_details_card_farmer.dart';
 import 'add_farmer_record.dart';
+import 'farmers_report_pdf.dart';
 
 class FarmerList extends StatelessWidget {
   FarmerList({super.key});
+
+  List<DocumentSnapshot> reportData = [];
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -26,9 +30,16 @@ class FarmerList extends StatelessWidget {
                 icon: Icon(searchProvider.searchFlag ? Icons.close : Icons.search),
               ),
             ),
-            const IconButton(
-              onPressed: null,
-              icon: Icon(Icons.print),
+            IconButton(
+              onPressed: () async{
+                final FarmersReportPdf reportGenerator = FarmersReportPdf();
+                final pdfBytes = await reportGenerator.generateReport(reportData);
+                final path = await reportGenerator.savePdf(pdfBytes, 'farmers_report');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('PDF saved at $path')),
+                );
+              },
+              icon: const Icon(Icons.print),
             ),
           ],
           title: Consumer<SearchProvider>(
@@ -83,6 +94,7 @@ class FarmerList extends StatelessWidget {
                     .toLowerCase()
                     .contains(Provider.of<SearchProvider>(context).searchQuery.toLowerCase()))
                     .toList();
+                reportData = documents;
                 return ListView.builder(
                   itemCount: documents.length,
                   itemBuilder: (context, index) {
