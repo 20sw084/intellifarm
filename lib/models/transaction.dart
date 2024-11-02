@@ -8,6 +8,7 @@ class TransactionModel {
   String? plantingNameTransaction;
   String typeOfTransaction;
   String? transactionTypeOther;
+  String? transactionTypeCategory;
   int earningAmount;
   String transactionDate;
   String? receiptNumber;
@@ -22,6 +23,7 @@ class TransactionModel {
     this.transactionSpecificToPlanting,
     this.plantingNameTransaction,
     this.transactionTypeOther,
+    this.transactionTypeCategory,
     this.receiptNumber,
     this.customerName,
     this.notes,
@@ -36,6 +38,7 @@ class TransactionModel {
       'transactionSpecificToPlanting': transactionSpecificToPlanting?.toString().split('.').last, // Convert to String
       'plantingNameTransaction': plantingNameTransaction,
       'transactionTypeOther': transactionTypeOther,
+      'transactionTypeCategory': transactionTypeCategory,
       'receiptNumber': receiptNumber,
       'customerName': customerName,
       'notes': notes,

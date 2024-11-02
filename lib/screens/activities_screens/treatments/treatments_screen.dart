@@ -2,40 +2,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/models/treatment.dart';
 import 'package:intellifarm/screens/activities_screens/treatments/add_activity_treatment.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/search_provider.dart';
 import '../../../util/common_methods.dart';
 import 'edit_activity_treatment.dart';
 
-class TreatmentsScreen extends StatefulWidget {
-  const TreatmentsScreen({super.key});
+class TreatmentsScreen extends StatelessWidget {
+  TreatmentsScreen({super.key});
 
-  @override
-  State<TreatmentsScreen> createState() => _TreatmentsScreenState();
-}
-
-// TODO : MARK AS Done is hardcoded rn.
-
-String isCheckboxChecked = "Last 7 days";
-
-class _TreatmentsScreenState extends State<TreatmentsScreen> {
-  bool searchFlag = false;
+  final TextEditingController _searchController = TextEditingController();
 
   List<String> keys = [
     "Date:",
-    "Status",
+    "Status:",
     "Field:",
     "Planting:",
     "Product:",
     "Quantity:",
     "Notes:"
-  ];
-  List<String> values = [
-    "18/06/2024",
-    "Planned",
-    "Badin Field",
-    "Jute (V1.0)",
-    "",
-    "0",
-    "Hello Dear"
   ];
 
   @override
@@ -44,18 +28,16 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.greenAccent,
         actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                searchFlag = !searchFlag;
-              });
-              //   Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (_) => const SearchPage(),
-              //   ),
-              // );
+          Consumer<SearchProvider>(
+            builder: (context, searchProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  searchProvider.toggleSearch();
+                },
+                icon: Icon(
+                    searchProvider.searchFlag ? Icons.close : Icons.search),
+              );
             },
-            icon: Icon(Icons.search),
           ),
           IconButton(
             onPressed: () {
@@ -267,34 +249,43 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
             ),
           ),
         ],
-        title: searchFlag
-            ? Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5)),
-                child: Center(
-                  child: TextField(
-                    decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            /* Clear the search field */
-                            setState(() {
-                              searchFlag = !searchFlag;
-                            });
-                          },
+        title: Consumer<SearchProvider>(
+          builder: (context, searchProvider, child) {
+            return searchProvider.searchFlag
+                ? Container(
+                    width: double.infinity,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Center(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          searchProvider.updateSearchQuery(value);
+                        },
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              searchProvider.clearSearch();
+                              _searchController.clear();
+                            },
+                          ),
+                          hintText: 'Search...',
+                          border: InputBorder.none,
                         ),
-                        hintText: 'Search...',
-                        border: InputBorder.none),
-                  ),
-                ),
-              )
-            : Text("Treatments"),
+                      ),
+                    ),
+                  )
+                : const Text("Treatments");
+          },
+        ),
       ),
       body: FutureBuilder<List<DocumentSnapshot>>(
-        future: getAllTreatments(), // Use the function that returns List<DocumentSnapshot>
+        future:
+            getAllTreatments(), // Use the function that returns List<DocumentSnapshot>
         builder: (BuildContext context,
             AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -303,222 +294,257 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
             return Center(child: Text("Error is: ${snapshot.error}"));
           } else if (snapshot.hasData) {
             List<DocumentSnapshot> treatments = snapshot.data!;
-            return ListView.builder(
-              itemCount: treatments.length,
-              itemBuilder: (context, index) {
-                var treatmentData = treatments[index].data() as Map<String, dynamic>;
-                Treatment t = Treatment(
-                  treatmentDate: treatmentData["treatmentDate"],
-                  treatmentStatus: treatmentStatusFromString(treatmentData["treatmentStatus"]),
-                  treatmentType: treatmentTypeFromString(treatmentData["treatmentType"]),
-                  fieldName: treatmentData["fieldName"],
-                  treatmentSpecificToPlanting: treatmentSpecificToPlantingFromString(treatmentData["treatmentSpecificToPlanting"]),
-                  plantingName: treatmentData["plantingName"] ?? " ",
-                  productUsed: treatmentData["productUsed"] ?? " ",
-                  quantityOfProduct: treatmentData["quantityOfProduct"] ?? 0,
-                  notes: treatmentData["notes"] ?? "",
-                );
-                return SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: 246,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Container(
-                            color: Colors.greenAccent,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
+            return Consumer<SearchProvider>(
+              builder: (context, searchProvider, child) {
+                // Filter documents based on search query
+                var filteredDocuments = treatments.where((doc) {
+                  var data = doc.data() as Map<String, dynamic>;
+                  return data['treatmentType']
+                      .toString()
+                      .toLowerCase()
+                      .contains(searchProvider.searchQuery.toLowerCase());
+                }).toList();
+                return ListView.builder(
+                  itemCount: filteredDocuments.length,
+                  itemBuilder: (context, index) {
+                    var treatmentData =
+                        filteredDocuments[index].data() as Map<String, dynamic>;
+                    Treatment t = Treatment(
+                      treatmentDate: treatmentData["treatmentDate"],
+                      treatmentStatus: treatmentStatusFromString(
+                          treatmentData["treatmentStatus"]),
+                      treatmentType: treatmentTypeFromString(
+                          treatmentData["treatmentType"]),
+                      fieldName: treatmentData["fieldName"],
+                      treatmentSpecificToPlanting:
+                          treatmentSpecificToPlantingFromString(
+                              treatmentData["treatmentSpecificToPlanting"]),
+                      plantingName: treatmentData["plantingName"] ?? " ",
+                      productUsed: treatmentData["productUsed"] ?? " ",
+                      quantityOfProduct:
+                          treatmentData["quantityOfProduct"] ?? 0,
+                      notes: treatmentData["notes"] ?? "",
+                    );
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: 246,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                color: Colors.greenAccent,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(Icons
-                                          .transfer_within_a_station_sharp),
-                                      SizedBox(
-                                        width: 15,
+                                      Row(
+                                        children: [
+                                          Icon(Icons
+                                              .transfer_within_a_station_sharp),
+                                          SizedBox(
+                                            width: 15,
+                                          ),
+                                          Text(t.treatmentType
+                                              .toString()
+                                              .split(".")
+                                              .last),
+                                        ],
                                       ),
-                                      Text(t.treatmentType.toString().split(".").last),
+                                      IconButton(
+                                          icon: Icon(Icons.more_vert),
+                                          onPressed: () {
+                                            showMenu(
+                                              context: context,
+                                              position: RelativeRect.fromLTRB(
+                                                  100, 100, 0, 0),
+                                              items: [
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  child: Text('Edit Record'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 2,
+                                                  child: Text('Mark as Done'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 3,
+                                                  child: Text('Duplicate'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 4,
+                                                  child: Text('Delete'),
+                                                ),
+                                              ],
+                                              elevation: 8.0,
+                                            ).then((value) {
+                                              switch (value) {
+                                                case 1:
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EditActivityTreatment(
+                                                          treatment: t,
+                                                        ),
+                                                      ));
+                                                  break;
+                                                case 2:
+                                                  print('Option 2 selected');
+                                                  break;
+                                                case 3:
+                                                  print('Option 3 selected');
+                                                  break;
+                                                case 4:
+                                                  print('Option 4 selected');
+                                                  break;
+                                              }
+                                            });
+                                          }),
                                     ],
                                   ),
-                                  IconButton(
-                                      icon: Icon(Icons.more_vert),
-                                      onPressed: () {
-                                        showMenu(
-                                          context: context,
-                                          position: RelativeRect.fromLTRB(
-                                              100, 100, 0, 0),
-                                          items: [
-                                            PopupMenuItem(
-                                              child: Text('Edit Record'),
-                                              value: 1,
-                                            ),
-                                            PopupMenuItem(
-                                              child: Text('Mark as Done'),
-                                              value: 2,
-                                            ),
-                                            PopupMenuItem(
-                                              child: Text('Duplicate'),
-                                              value: 3,
-                                            ),
-                                            PopupMenuItem(
-                                              child: Text('Delete'),
-                                              value: 4,
-                                            ),
-                                          ],
-                                          elevation: 8.0,
-                                        ).then((value) {
-                                          switch (value) {
-                                            case 1:
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        EditActivityTreatment(treatment: t,),
-                                                  ));
-                                              break;
-                                            case 2:
-                                              print('Option 2 selected');
-                                              break;
-                                            case 3:
-                                              print('Option 3 selected');
-                                              break;
-                                            case 4:
-                                              print('Option 4 selected');
-                                              break;
-                                          }
-                                        });
-                                      }),
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(0),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.treatmentDate,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(0),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(1),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.treatmentStatus
+                                        .toString()
+                                        .split(".")
+                                        .last,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                t.treatmentDate,
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(2),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.fieldName,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(1),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
+                              t.plantingName!.isEmpty
+                                  ? Container()
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(
+                                          keys.elementAt(3),
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                          ),
+                                        ),
+                                        Text(
+                                          t.plantingName ?? " ",
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(4),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.productUsed ?? " ",
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                t.treatmentStatus.toString().split(".").last,
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(5),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.quantityOfProduct.toString(),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(2),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                              Text(
-                                t.fieldName,
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          t.plantingName!.isEmpty ? Container() : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(3),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                              Text(
-                                t.plantingName ?? " ",
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(4),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                              Text(
-                                t.productUsed ?? " ",
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(5),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                              Text(
-                                t.quantityOfProduct.toString(),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                keys.elementAt(6),
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                              Text(
-                                t.notes ?? " ",
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(6),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.notes ?? " ",
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 );
               },
             );
@@ -544,3 +570,7 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
     );
   }
 }
+
+// TODO : MARK AS Done is hardcoded rn.
+
+String isCheckboxChecked = "Last 7 days";

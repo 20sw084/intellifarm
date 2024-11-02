@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intellifarm/util/field_status_enum.dart';
 import 'package:intellifarm/util/field_type_enum.dart';
 import 'package:intellifarm/util/light_profile_enum.dart';
+import 'package:provider/provider.dart';
 
 import '../../../controller/references.dart';
 import '../../../models/fields/field.dart';
+import '../../../providers/field_provider.dart';
 
 class AddFieldRecord extends StatelessWidget {
   AddFieldRecord({super.key});
@@ -29,6 +31,8 @@ class AddFieldRecord extends StatelessWidget {
           IconButton(
             onPressed: () {
               _saveForm(context);
+              Provider.of<FieldProvider>(context, listen: false).needsRefresh = true;
+              // Navigator.pop(context);
             },
             icon: Icon(Icons.check_box),
           ),

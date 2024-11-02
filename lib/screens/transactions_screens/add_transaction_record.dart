@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intellifarm/screens/miscellaneous_screens/income_categories/income_categories_screen.dart';
 import 'package:intellifarm/util/transaction_specific_to_field_enum.dart';
 import 'package:intellifarm/util/type_of_income_enum.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +9,7 @@ import '../../models/transaction.dart';
 import '../../util/common_methods.dart';
 import '../../util/transaction_specific_to_planting_enum.dart';
 import '../../util/type_of_expense_enum.dart';
+import '../miscellaneous_screens/expense_categories/expense_categories_screen.dart';
 
 class AddTransactionRecord extends StatelessWidget {
   final String type;
@@ -19,12 +21,16 @@ class AddTransactionRecord extends StatelessWidget {
   final TextEditingController _plantingNameTransactionController =  TextEditingController();
   final TextEditingController _incomeTypeOtherController =  TextEditingController();
   final TextEditingController _expenseTypeOtherController =  TextEditingController();
+  final TextEditingController _incomeTypeCategoryController =  TextEditingController();
+  final TextEditingController _expenseTypeCategoryController =  TextEditingController();
   final TextEditingController _receiptNumberController =  TextEditingController();
   final TextEditingController _customerNameController =  TextEditingController();
   final TextEditingController _notesController =  TextEditingController();
   String? cropName;
   String? cropVariety;
   String? _selectedFieldName;
+  String? _selectedExpenseCategory;
+  String? _selectedIncomeCategory;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -252,7 +258,71 @@ class AddTransactionRecord extends StatelessWidget {
                             return null;
                           },
                         );
-                      } else {
+                      }
+                      else if (value == TypeOfIncome.ChooseCategory) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: StreamBuilder<QuerySnapshot>(
+                                  stream: getIncomeCategoriesViaStream(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    if (!snapshot.hasData) return Container();
+                                    return DropdownButtonFormField(
+                                      decoration: const InputDecoration(
+                                        labelText: 'Select Income Category *',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      isExpanded: false,
+                                      value: _selectedIncomeCategory,
+                                      items: snapshot.data?.docs.map((value) {
+                                        return DropdownMenuItem(
+                                          value: value.get('categoryName'),
+                                          child: Text('${value.get('categoryName')}'),
+                                        );
+                                      }).toList(),
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return 'Please select necessary fields';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (value) {
+                                        // debugPrint('selected onchange: $value');
+                                        _selectedIncomeCategory = value.toString();
+                                        _incomeTypeCategoryController.text = value.toString();
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                right: 8.0,
+                                left: 8.0,
+                              ),
+                              child: FloatingActionButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => IncomeCategoriesScreen(),
+                                    ),
+                                  );
+                                },
+                                backgroundColor: Colors.greenAccent,
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      else {
                         return SizedBox.shrink();
                       }
                     },
@@ -299,7 +369,69 @@ class AddTransactionRecord extends StatelessWidget {
                           return null;
                         },
                       );
-                    } else {
+                    }
+                    else if (value == TypeOfExpense.ChooseCategory) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: getExpenseCategoriesViaStream(),
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (!snapshot.hasData) return Container();
+
+                                  return DropdownButtonFormField<String>(
+                                    decoration: const InputDecoration(
+                                      labelText: 'Select Expense Category *',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    isExpanded: false,
+                                    value: _selectedExpenseCategory,
+                                    items: snapshot.data?.docs.map((value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value.get('categoryName') as String,
+                                        child: Text(value.get('categoryName')),
+                                      );
+                                    }).toList(),
+                                    validator: (value) {
+                                      if (value == null) {
+                                        return 'Please select necessary fields';
+                                      }
+                                      return null;
+                                    },
+                                    onChanged: (value) {
+                                      // setState(() {
+                                        _selectedExpenseCategory = value;
+                                        _expenseTypeCategoryController.text = value.toString();
+                                      // });
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ExpenseCategoriesScreen(),
+                                  ),
+                                );
+                              },
+                              backgroundColor: Colors.greenAccent,
+                              child: const Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    else {
                       return SizedBox.shrink();
                     }
                   },
@@ -366,6 +498,25 @@ class AddTransactionRecord extends StatelessWidget {
       ),
     );
   }
+
+  Stream<QuerySnapshot> getIncomeCategoriesViaStream() async* {
+    References r = References();
+    String? id = await r.getLoggedUserId();
+    yield* r.usersRef
+        .doc(id)
+        .collection("incomeCategories")
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getExpenseCategoriesViaStream() async* {
+    References r = References();
+    String? id = await r.getLoggedUserId();
+    yield* r.usersRef
+        .doc(id)
+        .collection("expenseCategories")
+        .snapshots();
+  }
+
   Future<void> _saveForm(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       // Form is valid, proceed with saving data
@@ -390,6 +541,7 @@ class AddTransactionRecord extends StatelessWidget {
                 .value,
             plantingNameTransaction: _plantingNameTransactionController.text,
             transactionTypeOther: _incomeTypeOtherController.text,
+            transactionTypeCategory: _incomeTypeCategoryController.text,
             customerName: _customerNameController.text,
             receiptNumber: _receiptNumberController.text,
             notes: _notesController.text,
@@ -545,6 +697,7 @@ class AddTransactionRecord extends StatelessWidget {
                 .value,
             plantingNameTransaction: _plantingNameTransactionController.text,
             transactionTypeOther: _expenseTypeOtherController.text,
+            transactionTypeCategory: _expenseTypeCategoryController.text,
             customerName: _customerNameController.text,
             receiptNumber: _receiptNumberController.text,
             notes: _notesController.text,

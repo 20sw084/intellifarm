@@ -345,6 +345,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                               plantingNameTransaction: transactionData["plantingNameTransaction"],
                               typeOfTransaction: transactionData["typeOfTransaction"],
                               transactionTypeOther: transactionData["transactionTypeOther"],
+                              transactionTypeCategory: transactionData["transactionTypeCategory"],
                               earningAmount: transactionData["earningAmount"],
                               transactionDate: transactionData["transactionDate"],
                               receiptNumber: transactionData["receiptNumber"],
@@ -365,9 +366,9 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "${trans.transactionTypeOther!.isEmpty ? " ":"${trans.transactionTypeOther} "}[${(trans.plantingNameTransaction == null || trans.plantingNameTransaction?.split("|").isEmpty == true) ? "" :
-                                        "${(trans.plantingNameTransaction!.split("|").length > 0) ? trans.plantingNameTransaction!.split("|")[0] : ""}${(trans.plantingNameTransaction!.split("|").length > 1) ? ", ${trans.plantingNameTransaction!.split("|")[1]}" : ""}"} ${(trans.fieldName==null ? "": ", ${trans.fieldName}")}]",
-                                        style: TextStyle(
+                                        "${(trans.transactionTypeOther?.isEmpty ?? true) ? trans.transactionTypeCategory : "${trans.transactionTypeOther} "}[${(trans.plantingNameTransaction == null || trans.plantingNameTransaction?.split("|").isEmpty == true) ? "" :
+                                        "${(trans.plantingNameTransaction!.split("|").length > 0) ? trans.plantingNameTransaction!.split("|")[0] : ""}${(trans.plantingNameTransaction!.split("|").length > 1) ? ", ${trans.plantingNameTransaction!.split("|")[1]}" : ""}"} ${(trans.fieldName==null ? "" : ", ${trans.fieldName}")}]",
+                                        style: const TextStyle(
                                           fontSize: 16,
                                         ),
                                       ),
@@ -623,6 +624,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                         plantingNameTransaction: transactionData["plantingNameTransaction"],
                         typeOfTransaction: transactionData["typeOfTransaction"],
                         transactionTypeOther: transactionData["transactionTypeOther"],
+                        transactionTypeCategory: transactionData["transactionTypeCategory"],
                         earningAmount: transactionData["earningAmount"],
                         transactionDate: transactionData["transactionDate"],
                         receiptNumber: transactionData["receiptNumber"],
@@ -643,7 +645,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${trans.transactionTypeOther!.isEmpty ? " ":"${trans.transactionTypeOther} "}[${(trans.plantingNameTransaction == null || trans.plantingNameTransaction?.split("|").isEmpty == true) ? "" :
+                                  "${trans.transactionTypeOther!.isEmpty ? "${trans.transactionTypeCategory} " :"${trans.transactionTypeOther} "}[${(trans.plantingNameTransaction == null || trans.plantingNameTransaction?.split("|").isEmpty == true) ? "" :
                                   "${(trans.plantingNameTransaction!.split("|").length > 0) ? trans.plantingNameTransaction!.split("|")[0] : ""}${(trans.plantingNameTransaction!.split("|").length > 1) ? ", ${trans.plantingNameTransaction!.split("|")[1]}" : ""}"} ${(trans.fieldName==null ? "": ", ${trans.fieldName}")}]",
                                   style: TextStyle(
                                     fontSize: 16,

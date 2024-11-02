@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../controller/references.dart';
+import '../providers/crop_provider.dart';
 import '../screens/activities_screens/plantings/add_planting.dart';
 import '../screens/farmers_crops_fields_screens/crop_screens/add_crop_variety.dart';
 import '../screens/farmers_crops_fields_screens/crop_screens/edit_crop_record.dart';
@@ -13,10 +15,8 @@ class ListDetailsCardCrop extends StatelessWidget {
   final Map<String, dynamic> dataMap;
   final dynamic onTap;
 
-  ListDetailsCardCrop({
+  const ListDetailsCardCrop({
     super.key,
-    // this.keys,
-    // this.values,
     required this.dataMap,
     this.onTap,
   });
@@ -105,28 +105,64 @@ class ListDetailsCardCrop extends StatelessWidget {
                           items: [
                             const PopupMenuItem(
                               value: 1,
-                              child: Text('View Details'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.remove_red_eye, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('View Details'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 2,
-                              child: Text('Edit Record'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Edit Record'),
+                                ],
+                              ),
                             ),
                             // (keys?.elementAt(1) == "Type:")?
                             const PopupMenuItem(
                               value: 3,
-                              child: Text('Add Variety'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.add_box, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Add Variety'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 4,
-                              child: Text('Add Planting'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.add_box, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Add Planting'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 5,
-                              child: Text('Print PDF'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.print, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Print PDF'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 6,
-                              child: Text('Delete'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: Colors.red,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Delete Crop'),
+                                ],
+                              ),
                             ),
                           ],
                           // Handle the selected menu item
@@ -140,36 +176,49 @@ class ListDetailsCardCrop extends StatelessWidget {
                                 MaterialPageRoute(
                                   builder: (context) => ViewCropDetails(
                                     dataMap: dataMap,
-                                    // keys: keys, values: values,
-                                    // dataMap: {
-                                    //   "Name:": dataMap['name'].toString(),
-                                    //   "Harvest Unit:": dataMap['harvestUnit'].toString(),
-                                    //   "Varieties:": varietiesCountList[index].toString(),
-                                    //   "Plantings:": plantingsCountList[index].toString(),
-                                    //   "Notes:": dataMap['notes'].toString(),
-                                    // },
                                   ),
                                 ),
                               );
                               break;
                             case 2:
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditCropRecord(dataMap: dataMap,),));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditCropRecord(
+                                      dataMap: dataMap,
+                                    ),
+                                  ));
                               break;
                             case 3:
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddCropVariety(cropName: dataMap["Name:"],),
+                                  builder: (context) => AddCropVariety(
+                                    cropName: dataMap["Name:"],
+                                  ),
                                 ),
-                              );
+                              ).then((_) {
+                                Provider.of<CropProvider>(
+                                  context,
+                                  listen: false,
+                                ).needsRefresh = true;
+                              });
                               break;
                             case 4:
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddPlanting(cropName: dataMap["Name:"],),
+                                  builder: (context) => AddPlanting(
+                                    cropName: dataMap["Name:"],
+                                  ),
                                 ),
-                              );
+                              ).then((_) {
+
+                                Provider.of<CropProvider>(
+                                  context,
+                                  listen: false,
+                                ).needsRefresh = true;
+                              });
                               break;
                             case 5:
                               print('Option 5 selected');
@@ -180,14 +229,7 @@ class ListDetailsCardCrop extends StatelessWidget {
                                 builder: (BuildContext context) {
                                   return ConfirmDeleteCropDialog(
                                     onConfirm: () async {
-                                      try {
-                                        References r = References();
-                                        r.deleteCropDocument("crops", dataMap["Name:"],);
-                                      } catch(e){
-                                        if (kDebugMode) {
-                                          print(e);
-                                        }
-                                      }
+                                      await _deleteCrop(context, dataMap["Name:"]);
                                     },
                                   );
                                 },
@@ -195,7 +237,6 @@ class ListDetailsCardCrop extends StatelessWidget {
                               break;
                           }
                         });
-
                       },
                       icon: const Icon(Icons.more_vert),
                     ),
@@ -207,5 +248,14 @@ class ListDetailsCardCrop extends StatelessWidget {
         ),
       ),
     );
+  }
+  Future<void> _deleteCrop(BuildContext context, String cropName) async {
+    try {
+      final cropProvider = Provider.of<CropProvider>(context, listen: false);
+      await cropProvider.deleteCrop("CropType.$cropName");
+      cropProvider.needsRefresh = true;
+    } catch (e) {
+      print('Error deleting field: $e');
+    }
   }
 }

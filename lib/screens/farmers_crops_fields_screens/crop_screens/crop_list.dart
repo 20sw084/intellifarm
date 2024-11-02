@@ -1,14 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intellifarm/controller/references.dart';
-import 'package:intellifarm/screens/farmers_crops_fields_screens/crop_screens/view_crop_details.dart';
+import 'package:intellifarm/providers/crop_provider.dart';
 import '../../../providers/search_provider.dart';
 import '../../../widgets/list_details_card_crop.dart';
 import 'add_crop_record.dart';
+import 'view_crop_details.dart';
 
 class CropList extends StatelessWidget {
-  const CropList({super.key});
+  CropList({super.key});
+
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +43,7 @@ class CropList extends StatelessWidget {
                 ),
                 child: Center(
                   child: TextField(
+                    controller: _searchController,
                     onChanged: (value) {
                       searchProvider.updateSearchQuery(value);
                     },
@@ -50,6 +52,7 @@ class CropList extends StatelessWidget {
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           searchProvider.clearSearch();
+                          _searchController.clear();
                         },
                       ),
                       hintText: 'Search...',
@@ -64,60 +67,50 @@ class CropList extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.all(15.0),
-          child: FutureBuilder(
-            future: getCropsPlantingsAndVarietiesData(),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          child: Consumer<CropProvider>(
+            builder: (context, cropProvider, _) {
+              if (cropProvider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error is: ${snapshot.error}"));
-              } else if (snapshot.hasData) {
-                return Consumer<SearchProvider>(
-                  builder: (context, searchProvider, _) {
-                    var querySnapshot = snapshot.data[0];
-                    List<DocumentSnapshot> documents = querySnapshot.docs
-                        .where((doc) => (doc.data() as Map<String, dynamic>)['name']
-                        .toString()
-                        .toLowerCase()
-                        .contains(searchProvider.searchQuery.toLowerCase()))
-                        .toList();
-                    List<int> plantingsCountList = snapshot.data[1];
-                    List<int> varietiesCountList = snapshot.data[2];
-                    return ListView.builder(
-                      itemCount: documents.length,
-                      itemBuilder: (context, index) {
-                        var data = documents[index].data() as Map<String, dynamic>;
-                        return ListDetailsCardCrop(
-                          dataMap: {
-                            "Name:": data['name'].toString().split(".").last,
-                            "Harvest Unit:": data['harvestUnit'].toString().split(".").last,
-                            "Varieties:": varietiesCountList[index].toString(),
-                            "Plantings:": plantingsCountList[index].toString(),
-                            "Notes:": data['notes'].toString(),
-                          },
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ViewCropDetails(
-                                  dataMap: {
-                                    "Name:": data['name'].toString(),
-                                    "Harvest Unit:": data['harvestUnit'].toString(),
-                                    "Varieties:": varietiesCountList[index].toString(),
-                                    "Plantings:": plantingsCountList[index].toString(),
-                                    "Notes:": data['notes'].toString(),
-                                  },
-                                ),
-                              ),
-                            );
-                          },
+              } else if (cropProvider.errorMessage.isNotEmpty) {
+                return Center(child: Text("Error is: ${cropProvider.errorMessage}"));
+              } else {
+                var documents = cropProvider.crops
+                    .where((doc) => (doc.data() as Map<String, dynamic>)['name']
+                    .toString()
+                    .toLowerCase()
+                    .contains(Provider.of<SearchProvider>(context).searchQuery.toLowerCase()))
+                    .toList();
+                return ListView.builder(
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    var data = documents[index].data() as Map<String, dynamic>;
+                    return ListDetailsCardCrop(
+                      dataMap: {
+                        "Name:": data['name'].toString().split(".").last,
+                        "Harvest Unit:": data['harvestUnit'].toString().split(".").last,
+                        "Varieties:": cropProvider.varietiesCountList[index].toString(),
+                        "Plantings:": cropProvider.plantingsCountList[index].toString(),
+                        "Notes:": data['notes'].toString(),
+                      },
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewCropDetails(
+                              dataMap: {
+                                "Name:": data['name'].toString(),
+                                "Harvest Unit:": data['harvestUnit'].toString(),
+                                "Varieties:": cropProvider.varietiesCountList[index].toString(),
+                                "Plantings:": cropProvider.plantingsCountList[index].toString(),
+                                "Notes:": data['notes'].toString(),
+                              },
+                            ),
+                          ),
                         );
                       },
                     );
                   },
                 );
-              } else {
-                return const Center(child: Text("No data available"));
               }
             },
           ),
@@ -129,7 +122,9 @@ class CropList extends StatelessWidget {
               MaterialPageRoute(
                 builder: (context) => AddCropRecord(),
               ),
-            );
+            ).then((_) {
+              Provider.of<CropProvider>(context, listen: false).needsRefresh = true;
+            });
           },
           icon: const Icon(Icons.add),
           label: const Text('Add'),
@@ -137,23 +132,5 @@ class CropList extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<List<dynamic>> getCropsPlantingsAndVarietiesData() async {
-    References r = References();
-    String? id = await r.getLoggedUserId();
-    QuerySnapshot cropsSnapshot = await r.usersRef.doc(id).collection("crops").get();
-
-    List<int> plantingsCountList = [];
-    List<int> varietiesCountList = [];
-
-    for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-      QuerySnapshot plantingsSnapshot = await cropDoc.reference.collection("plantings").get();
-      QuerySnapshot varietiesSnapshot = await cropDoc.reference.collection("varieties").get();
-      plantingsCountList.add(plantingsSnapshot.size);
-      varietiesCountList.add(varietiesSnapshot.size);
-    }
-
-    return [cropsSnapshot, plantingsCountList, varietiesCountList];
   }
 }

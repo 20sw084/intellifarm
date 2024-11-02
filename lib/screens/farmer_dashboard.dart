@@ -7,6 +7,7 @@ import '../controller/references.dart';
 import '../widgets/card_widget.dart';
 import 'package:intellifarm/util/common_methods.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FarmerDashboard extends StatefulWidget {
   const FarmerDashboard({super.key, }); // Initialize it in the constructor
@@ -28,7 +29,6 @@ class FarmerDashboardState extends State<FarmerDashboard> {
         _selectedReceipt = File(pickedFile.path);
       });
 
-      // Ensure the type is not null and pass it to the ViewImageScreen
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -302,8 +302,6 @@ class ViewImageScreen extends StatelessWidget {
   }
 }
 
-
-// Share Rule:
-// Category distribution / making eg: Tractor , Electricity Bills.
+// Share Rule backend implementation:
 // State:
 // PDF on every page.

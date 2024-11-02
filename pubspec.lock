@@ -261,10 +261,10 @@ packages:
     dependency: "direct main"
     description:
       name: firebase_storage
-      sha256: e00e2909e36f5e44f839fd77dff90ff764f7bb303ed548d43617014ce05c77c8
+      sha256: "04da94a710b0c08666de7dfa19812c9b5d404ea080a7a9d402ecb80705754122"
       url: "https://pub.dev"
     source: hosted
-    version: "12.3.3"
+    version: "12.3.4"
   firebase_storage_platform_interface:
     dependency: transitive
     description:
@@ -396,10 +396,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_android
-      sha256: d34e0d9e024e81321b2aeed7b202ec6181cc282e6a1c0c0b4e6ad07ef1065d82
+      sha256: "8faba09ba361d4b246dc0a17cb4289b3324c2b9f6db7b3d457ee69106a86bd32"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.12+16"
+    version: "0.8.12+17"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -556,18 +556,18 @@ packages:
     dependency: transitive
     description:
       name: path_parsing
-      sha256: e3e67b1629e6f7e8100b367d3db6ba6af4b1f0bb80f64db18ef1fbabd2fa9ccf
+      sha256: "45f7d6bba1128761de5540f39d5ca000ea8a1f22f06b76b61094a60a2997bd0e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   path_provider:
     dependency: "direct main"
     description:
       name: path_provider
-      sha256: fec0d61223fba3154d87759e3cc27fe2c8dc498f6386c6d6fc80d1afdd1bf378
+      sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   path_provider_android:
     dependency: transitive
     description:

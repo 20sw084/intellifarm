@@ -4,8 +4,10 @@ import 'package:intellifarm/screens/farmers_crops_fields_screens/crop_screens/ad
 import 'package:intellifarm/screens/farmers_crops_fields_screens/field_screens/add_field_record.dart';
 import 'package:intellifarm/util/planting_type_enum.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../controller/references.dart';
 import '../../../models/crops/cropPlanting.dart';
+import '../../../providers/field_provider.dart';
 import '../../../util/common_methods.dart';
 import '../../../util/field_status_after_planting_enum.dart';
 import '../../farmers_crops_fields_screens/crop_screens/add_crop_variety.dart';
@@ -72,6 +74,7 @@ class AddPlanting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    cropName = "CropType.$cropName";
     return Scaffold(
       appBar: AppBar(
         title: Text("New Planting"),
@@ -161,7 +164,6 @@ class AddPlanting extends StatelessWidget {
                                 return null;
                               },
                               onChanged: (value) {
-                                // debugPrint('selected onchange: $value');
                                 cropName = value.toString();
                               },
                             );
@@ -476,13 +478,16 @@ class AddPlanting extends StatelessWidget {
       varietyName: _cropVariety,
       fieldName: fieldName,
       firstHarvestDate: _harvestingDateController.text,
-      // TODO: Handle null operation wisely here
-      quantityPlanted: int.parse(_quantityPlantedController.text), // ?? "0"),
-      estimatedYield: int.parse(_estimatedYieldController.text),
+      quantityPlanted: int.parse(_quantityPlantedController.text),
+      estimatedYield: _estimatedYieldController.text.isNotEmpty
+          ? int.parse(_estimatedYieldController.text)
+          : 0,
       distanceBetweenPlants: _distanceBetweenPlantsController.text,
       seedCompany: _seedCompanyController.text,
       seedType: _seedTypeController.text,
-      seedLotNumber: int.parse(_seedLotNumberController.text),
+      seedLotNumber: _seedLotNumberController.text.isNotEmpty
+          ? int.parse(_seedLotNumberController.text)
+          : 0,
       seedOrigin: _seedOriginController.text,
       notes: _notesController.text,
     );
@@ -513,7 +518,8 @@ class AddPlanting extends StatelessWidget {
               .update(
             {"fieldStatus" : fieldStatusNotifier.value.toString().split(".").last,}
           );
-
+          Provider.of<FieldProvider>(context, listen: false).needsRefresh =
+          true;
           print("Success: Planting added successfully.");
           Navigator.pop(context);
         } else {

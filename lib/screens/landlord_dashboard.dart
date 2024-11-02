@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intellifarm/screens/miscellaneous_screens/miscellaneous_screen.dart';
 import 'package:intellifarm/screens/reports_screens/reports_screen.dart';
 import 'package:intellifarm/screens/transactions_screens/transactions_screen.dart';
 import 'package:intellifarm/util/common_methods.dart';
@@ -160,6 +161,13 @@ class LandlordDashboard extends StatelessWidget {
                     height: 180,
                     text: "Miscellaneous",
                     logo: Icons.miscellaneous_services,
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MiscellaneousScreen(),
+                          ));
+                    },
                   ),
                 ),
               ],

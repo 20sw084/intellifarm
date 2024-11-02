@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intellifarm/util/field_type_enum.dart';
 import 'package:intellifarm/util/light_profile_enum.dart';
-
+import 'package:provider/provider.dart';
 import '../../../controller/references.dart';
 import '../../../models/crops/cropVariety.dart';
+import '../../../providers/crop_provider.dart';
 
 class AddCropVariety extends StatelessWidget {
   String cropName;
@@ -47,7 +48,7 @@ class AddCropVariety extends StatelessWidget {
                       SizedBox(width: 10),
                       Icon(Icons.kayaking),
                       SizedBox(width: 10),
-                      Text(cropName ?? "Crop Name not fetced"),
+                      Text(cropName ?? "Crop Name not fetched"),
                     ],
                   ),
                 ),
@@ -156,7 +157,6 @@ class AddCropVariety extends StatelessWidget {
     );
   }
 
-
   Future<void> _saveForm(BuildContext context) async {
     CropVariety c = CropVariety(
       varietyName: varietyName.text,
@@ -174,11 +174,12 @@ class AddCropVariety extends StatelessWidget {
 
       try {
         // crop name k basis per code lena h
-        String? cropId = await r.getCropIdByName(cropName);
+        String? cropId = await r.getCropIdByName("CropType.$cropName");
         if (id != null) {
           await r.usersRef.doc(id).collection('crops').doc(cropId).collection("varieties").add(
             c.getCropVarietyDataMap(),
           );
+          Provider.of<CropProvider>(context, listen: false).needsRefresh = true;
           print("Success: Variety added successfully.");
           Navigator.pop(context);
         } else {

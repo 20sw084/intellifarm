@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../controller/references.dart';
+import '../../../providers/crop_provider.dart';
 import '../../../util/common_methods.dart';
 import '../../../widgets/confirm_delete_crop_dialog.dart';
 import '../../activities_screens/plantings/add_planting.dart';
 import 'add_crop_variety.dart';
 import 'edit_crop_record.dart';
-
 
 class ViewCropDetails extends StatelessWidget {
   final Map<String, dynamic> dataMap;
@@ -26,108 +27,7 @@ class ViewCropDetails extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.greenAccent,
-            actions: [
-              IconButton(
-                onPressed: (){
-                  showMenu(
-                    context: context,
-                    position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                    items: [
-                      const PopupMenuItem(
-                        value: 1,
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit, color: Colors.amber,),
-                            SizedBox(width: 10.0,),
-                            Text('Edit Record'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 2,
-                        child: Row(
-                          children: [
-                            Icon(Icons.add_box, color: Colors.amber,),
-                            SizedBox(width: 10.0,),
-                            Text('Add Variety'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 3,
-                        child: Row(
-                          children: [
-                            Icon(Icons.add_box, color: Colors.amber,),
-                            SizedBox(width: 10.0,),
-                            Text('Add Planting'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 4,
-                        child: Row(
-                          children: [
-                            Icon(Icons.print, color: Colors.amber,),
-                            SizedBox(width: 10.0,),
-                            Text('Print PDF'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 5,
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_forever_rounded, color: Colors.red,),
-                            SizedBox(width: 10.0,),
-                            Text('Delete Crop'),
-                          ],
-                        ),
-                      ),
-                    ],
-                    // Handle the selected menu item
-                    elevation: 8.0,
-                  ).then((value) {
-                    // Handle the selected value
-                    switch (value) {
-                      case 1:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => EditCropRecord(dataMap: dataMap,),)); // cropName: values!.elementAt(0), harvestUnit: values!.elementAt(1), notes: values!.elementAt(4),),));
-                        break;
-                      case 2:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => AddCropVariety(cropName: dataMap["Name:"]),));
-                        break;
-                      case 3:
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => AddPlanting(cropName: dataMap["Name:"]),));
-                        break;
-                      case 4:
-
-                        break;
-                      case 5:
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return ConfirmDeleteCropDialog(
-                              onConfirm: () {
-                                try {
-                                  References r = References();
-                                  r.deleteCropDocument("crops", dataMap["Name:"]);
-                                  // r.deleteCropDocument("crops", values!.elementAt(0));
-                                } catch(e){
-                                  if (kDebugMode) {
-                                    print(e);
-                                  }
-                                }
-                              },
-                            );
-                          },
-                        );
-                        break;
-                    }
-                  });
-                },
-                icon: const Icon(Icons.more_vert),
-              ),
-            ],
-            title: Text(dataMap["Name:"]),
+            title: Text(dataMap["Name:"].toString().split(".").last),
             // title: Text(values!.first),
             bottom: TabBar(
               isScrollable: true,
@@ -174,7 +74,7 @@ class ViewCropDetails extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              dataMap["Name:"],
+                              dataMap["Name:"].toString().split(".").last,
                               style: const TextStyle(
                                 fontSize: 12.5,
                               ),
@@ -191,7 +91,7 @@ class ViewCropDetails extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              dataMap["Harvest Unit:"],
+                              dataMap["Harvest Unit:"].toString().split(".").last,
                               style: const TextStyle(
                                 fontSize: 12.5,
                               ),
@@ -343,8 +243,8 @@ class ViewCropDetails extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      buildInfoRow("LightProfile:", firestoreData['lightProfile'].toString()),
-                                      buildInfoRow("Field Type:", firestoreData['fieldType'].toString()),
+                                      buildInfoRow("LightProfile:", firestoreData['lightProfile'].toString().split(".").last),
+                                      buildInfoRow("Field Type:", firestoreData['fieldType'].toString().split(".").last),
                                       buildInfoRow("Days to Maturity:", firestoreData['daysToMaturity'].toString()),
                                       buildInfoRow("Harvest Window:", firestoreData['harvestWindowDays'].toString()),
                                       buildInfoRow("Plantings:", plantingsCount.toString()), // Display the plantings count here
@@ -483,7 +383,7 @@ class ViewCropDetails extends StatelessWidget {
                                   buildInfoRow("Date", firestoreData?['plantingDate'].toString() ?? " "),
                                   buildInfoRow("Age", "$pdAge days"),  // Display the age in days
                                   buildInfoRow("Field", "Badin"),
-                                  buildInfoRow("Crop", dataMap["Name:"]),
+                                  buildInfoRow("Crop", dataMap["Name:"].toString().split(".").last),
                                   buildInfoRow("Distance", firestoreData?['distanceBetweenPlants'].toString() ?? " "),
                                   buildInfoRow("Planted", firestoreData?['quantityPlanted'].toString() ?? " "),
                                   buildInfoRow("Estimated", firestoreData?['estimatedYield'].toString() ?? " "),
@@ -514,7 +414,6 @@ class ViewCropDetails extends StatelessWidget {
     String? id = await r.getLoggedUserId();
 
     try {
-      // crop name k basis per code lena h
       String? cropId = await r.getCropIdByName(dataMap["Name:"],);
       if (id != null) {
         return await r.usersRef.doc(id).collection("crops").doc(cropId).collection("plantings").get();
@@ -564,14 +463,9 @@ class ViewCropDetails extends StatelessWidget {
     String? id = await r.getLoggedUserId();
 
     try {
-      // crop name k basis per code lena h
       String? cropId = await r.getCropIdByName(dataMap["Name:"]);
       if (id != null) {
         return await r.usersRef.doc(id).collection("crops").doc(cropId).collection("varieties").get();
-        // await r.usersRef.doc(id).collection('crops').doc(cropId).collection("plantings").add(
-        //   c.getCropPlantingDataMap(),
-        // );
-        // print("Success: Planting added successfully.");
       } else {
         if (kDebugMode) {
           print("Error: User ID is null");

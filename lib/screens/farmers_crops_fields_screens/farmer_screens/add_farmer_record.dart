@@ -1,11 +1,13 @@
+// lib/screens/farmers_crops_fields_screens/farmer_screens/add_farmer_record.dart
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/controller/references.dart';
+import 'package:provider/provider.dart';
 import '../../../models/farmer.dart';
+import '../../../providers/farmer_provider.dart';
 import '../../../util/common_methods.dart';
 import '../../../util/share_rule_enum.dart';
-
 
 class AddFarmerRecord extends StatelessWidget {
   AddFarmerRecord({super.key});
@@ -27,7 +29,9 @@ class AddFarmerRecord extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () async {
-              await _saveForm(context);
+              await _saveForm(context).whenComplete(() {
+                Provider.of<FarmerProvider>(context, listen: false).needsRefresh = true;
+              });
             },
             icon: Icon(Icons.check_box),
           ),
@@ -164,7 +168,6 @@ class AddFarmerRecord extends StatelessWidget {
         Navigator.pop(context); // Close the loading dialog
       }
     }
-
   }
 }
 

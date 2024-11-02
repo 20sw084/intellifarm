@@ -1,23 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../models/task.dart';
+import '../../../providers/search_provider.dart';
 import '../../../util/common_methods.dart';
 import 'add_activity_task.dart';
 import 'edit_activity_task.dart';
 
-class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
-
-  @override
-  State<TasksScreen> createState() => _TasksScreenState();
-}
-
-String isCheckboxChecked = "Last 7 days";
-
-class _TasksScreenState extends State<TasksScreen> {
-  bool searchFlag = false;
+class TasksScreen extends StatelessWidget {
+  TasksScreen({super.key});
 
   List<String> keys = ["Date:", "Status:", "Field:", "Planting:", "Notes:"];
+
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -25,18 +20,16 @@ class _TasksScreenState extends State<TasksScreen> {
       appBar: AppBar(
         backgroundColor: Colors.greenAccent,
         actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                searchFlag = !searchFlag;
-              });
-              //   Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (_) => const SearchPage(),
-              //   ),
-              // );
+          Consumer<SearchProvider>(
+            builder: (context, searchProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  searchProvider.toggleSearch();
+                },
+                icon: Icon(
+                    searchProvider.searchFlag ? Icons.close : Icons.search),
+              );
             },
-            icon: Icon(Icons.search),
           ),
           IconButton(
             onPressed: () {
@@ -314,31 +307,39 @@ class _TasksScreenState extends State<TasksScreen> {
             ),
           ),
         ],
-        title: searchFlag
-            ? Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5)),
-                child: Center(
-                  child: TextField(
-                    decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            /* Clear the search field */
-                            setState(() {
-                              searchFlag = !searchFlag;
-                            });
-                          },
+        title: Consumer<SearchProvider>(
+          builder: (context, searchProvider, child) {
+            return searchProvider.searchFlag
+                ? Container(
+                    width: double.infinity,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Center(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) {
+                          searchProvider.updateSearchQuery(value);
+                        },
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              searchProvider.clearSearch();
+                              _searchController.clear();
+                            },
+                          ),
+                          hintText: 'Search...',
+                          border: InputBorder.none,
                         ),
-                        hintText: 'Search...',
-                        border: InputBorder.none),
-                  ),
-                ),
-              )
-            : Text("Tasks"),
+                      ),
+                    ),
+                  )
+                : const Text("Tasks");
+          },
+        ),
       ),
       body: FutureBuilder<List<DocumentSnapshot>>(
         future: getAllTasks(),
@@ -350,185 +351,207 @@ class _TasksScreenState extends State<TasksScreen> {
             return Center(child: Text("Error is: ${snapshot.error}"));
           } else if (snapshot.hasData) {
             List<DocumentSnapshot> tasks = snapshot.data!;
-            return ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                var tasksData = tasks[index].data() as Map<String, dynamic>;
-                Task t = Task(
-                  taskDate: tasksData["taskDate"],
-                  taskStatus: taskStatusFromString(tasksData["taskStatus"]),
-                  taskName: tasksData["taskName"],
-                  fieldName: tasksData["fieldName"],
-                  taskSpecificToPlanting: taskSpecificToPlantingFromString(tasksData["taskSpecificToPlanting"]),
-                  plantingName: tasksData["plantingName"] ?? " ",
-                  notes: tasksData["notes"] ?? "",
-                );
-                return SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 195,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Container(
-                          color: Colors.greenAccent,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.task),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text(t.taskName),
-                                  ],
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.more_vert),
-                                    onPressed: () {
-                                      showMenu(
-                                        context: context,
-                                        position: RelativeRect.fromLTRB(
-                                            100, 100, 0, 0),
-                                        items: [
-                                          PopupMenuItem(
-                                            value: 1,
-                                            child: Text('Edit Record'),
+            return Consumer<SearchProvider>(
+              builder: (context, searchProvider, child) {
+                // Filter documents based on search query
+                var filteredDocuments = tasks.where((doc) {
+                  var data = doc.data() as Map<String, dynamic>;
+                  return data['taskName']
+                      .toString()
+                      .toLowerCase()
+                      .contains(searchProvider.searchQuery.toLowerCase());
+                }).toList();
+                return ListView.builder(
+                  itemCount: filteredDocuments.length,
+                  itemBuilder: (context, index) {
+                    var tasksData =
+                        filteredDocuments[index].data() as Map<String, dynamic>;
+                    Task t = Task(
+                      taskDate: tasksData["taskDate"],
+                      taskStatus: taskStatusFromString(tasksData["taskStatus"]),
+                      taskName: tasksData["taskName"],
+                      fieldName: tasksData["fieldName"],
+                      taskSpecificToPlanting: taskSpecificToPlantingFromString(
+                          tasksData["taskSpecificToPlanting"]),
+                      plantingName: tasksData["plantingName"] ?? " ",
+                      notes: tasksData["notes"] ?? "",
+                    );
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: 195,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                color: Colors.greenAccent,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.task),
+                                          SizedBox(
+                                            width: 15,
                                           ),
-                                          PopupMenuItem(
-                                            value: 2,
-                                            child: Text('Mark as Done'),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 3,
-                                            child: Text('Duplicate'),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 4,
-                                            child: Text('Delete'),
-                                          ),
+                                          Text(t.taskName),
                                         ],
-                                        elevation: 8.0,
-                                      ).then((value) {
-                                        switch (value) {
-                                          case 1:
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EditActivityTask(task: t,),
-                                                ));
-                                            break;
-                                          case 2:
-                                            print('Option 2 selected');
-                                            break;
-                                          case 3:
-                                            print('Option 3 selected');
-                                            break;
-                                          case 4:
-                                            print('Option 4 selected');
-                                            break;
-                                        }
-                                      });
-                                    }),
-                              ],
-                            ),
+                                      ),
+                                      IconButton(
+                                          icon: Icon(Icons.more_vert),
+                                          onPressed: () {
+                                            showMenu(
+                                              context: context,
+                                              position: RelativeRect.fromLTRB(
+                                                  100, 100, 0, 0),
+                                              items: [
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  child: Text('Edit Record'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 2,
+                                                  child: Text('Mark as Done'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 3,
+                                                  child: Text('Duplicate'),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 4,
+                                                  child: Text('Delete'),
+                                                ),
+                                              ],
+                                              elevation: 8.0,
+                                            ).then((value) {
+                                              switch (value) {
+                                                case 1:
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EditActivityTask(
+                                                          task: t,
+                                                        ),
+                                                      ));
+                                                  break;
+                                                case 2:
+                                                  print('Option 2 selected');
+                                                  break;
+                                                case 3:
+                                                  print('Option 3 selected');
+                                                  break;
+                                                case 4:
+                                                  print('Option 4 selected');
+                                                  break;
+                                              }
+                                            });
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(0),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.taskDate,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(1),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.taskStatus.toString().split(".").last,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(2),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.fieldName,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(3),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.plantingName.toString(),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(
+                                    keys.elementAt(4),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    t.notes.toString(),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              keys.elementAt(0),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                            Text(
-                              t.taskDate,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              keys.elementAt(1),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                            Text(
-                              t.taskStatus.toString().split(".").last,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              keys.elementAt(2),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                            Text(
-                              t.fieldName,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              keys.elementAt(3),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                            Text(
-                              t.plantingName.toString(),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              keys.elementAt(4),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                            Text(
-                              t.notes.toString(),
-                              style: TextStyle(
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+                      ),
+                    );
+                  },
+                );
               },
             );
           } else {
@@ -551,3 +574,5 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 }
+
+String isCheckboxChecked = "Last 7 days";

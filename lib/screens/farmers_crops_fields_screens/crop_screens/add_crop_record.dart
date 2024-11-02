@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intellifarm/controller/references.dart';
-
+import 'package:provider/provider.dart';
 import '../../../models/crops/crop.dart';
+import '../../../providers/crop_provider.dart';
 import '../../../util/crop_type_enum.dart';
 import '../../../util/units_enum.dart';
 
@@ -135,6 +136,8 @@ class AddCropRecord extends StatelessWidget {
           await r.usersRef.doc(id).collection('crops').add(
             c.getCropDataMap(),
           );
+          // Notify the CropProvider to fetch the updated list of crops
+          Provider.of<CropProvider>(context, listen: false).fetchCropsData();
           Navigator.pop(context); // Close the loading dialog
           Navigator.pop(context); // Close the form
         } else {

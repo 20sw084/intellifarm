@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/models/fields/field.dart';
+import 'package:provider/provider.dart';
 import '../controller/references.dart';
+import '../providers/field_provider.dart';
 import '../screens/farmers_crops_fields_screens/field_screens/add_field_planting.dart';
 import '../screens/farmers_crops_fields_screens/field_screens/edit_field_record.dart';
 import '../screens/farmers_crops_fields_screens/field_screens/view_field_details.dart';
@@ -110,23 +112,53 @@ class ListDetailsCardField extends StatelessWidget {
                           items: [
                             const PopupMenuItem(
                               value: 1,
-                              child: Text('View Details'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.remove_red_eye, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('View Details'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 2,
-                              child: Text('Edit Record'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Edit Record'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 3,
-                              child: Text('Add Planting'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.add_box, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Add Planting'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 4,
-                              child: Text('Print PDF'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.print, color: Colors.amber,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Print PDF'),
+                                ],
+                              ),
                             ),
                             const PopupMenuItem(
                               value: 5,
-                              child: Text('Delete'),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: Colors.red,),
+                                  SizedBox(width: 10.0,),
+                                  Text('Delete Crop'),
+                                ],
+                              ),
                             ),
                           ],
                           // Handle the selected menu item
@@ -173,15 +205,7 @@ class ListDetailsCardField extends StatelessWidget {
                                 builder: (BuildContext context) {
                                   return ConfirmDeleteFieldDialog(
                                     onConfirm: () async {
-                                      try {
-                                        References r = References();
-                                        r.deleteCropDocument(
-                                            "fields", dataMap["Name:"]);
-                                      } catch (e) {
-                                        if (kDebugMode) {
-                                          print(e);
-                                        }
-                                      }
+                                      await _deleteField(context, dataMap["Name:"]);
                                     },
                                   );
                                 },
@@ -201,5 +225,13 @@ class ListDetailsCardField extends StatelessWidget {
       ),
     );
   }
-
+  Future<void> _deleteField(BuildContext context, String fieldName) async {
+    try {
+      final fieldProvider = Provider.of<FieldProvider>(context, listen: false);
+      await fieldProvider.deleteField(fieldName);
+      fieldProvider.needsRefresh = true;
+    } catch (e) {
+      print('Error deleting field: $e');
+    }
+  }
 }

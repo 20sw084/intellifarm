@@ -30,7 +30,7 @@ class FarmerCropsAndFields extends StatelessWidget {
                     text: "Farmers",
                     logo: Icons.supervised_user_circle,
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => FarmersList(),));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => FarmerList(),));
                     },
                   ),
                   CardWidget(

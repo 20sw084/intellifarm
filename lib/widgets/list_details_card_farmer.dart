@@ -21,7 +21,7 @@ class ListDetailsCardFarmer extends StatelessWidget {
       padding: const EdgeInsets.all(5.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
-        height: 160,
+        height: 165,
         child: GestureDetector(
           onTap: onTap,
           child: Card(
@@ -77,14 +77,38 @@ class ListDetailsCardFarmer extends StatelessWidget {
                               items: [
                                 PopupMenuItem(
                                     value: 1,
-                                    child: Text('Link with CropPlanting!')),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.link, color: Colors.amber,),
+                                        SizedBox(width: 10.0,),
+                                        Text('Link with CropPlanting!'),
+                                      ],
+                                    )),
                                 PopupMenuItem(
                                     value: 2,
-                                    child: Text('Edit Record')),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit, color: Colors.amber,),
+                                        SizedBox(width: 10.0,),
+                                        Text('Edit Record'),
+                                      ],
+                                    ),),
                                 PopupMenuItem(
                                     value: 3,
-                                    child: Text('Print PDF')),
-                                PopupMenuItem(value: 4, child: Text('Delete')),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.print, color: Colors.amber,),
+                                        SizedBox(width: 10.0,),
+                                        Text('Print PDF'),
+                                      ],
+                                    ),),
+                                PopupMenuItem(value: 4, child: Row(
+                                  children: [
+                                    Icon(Icons.delete_forever_rounded, color: Colors.red,),
+                                    SizedBox(width: 10.0,),
+                                    Text('Delete Farmer'),
+                                  ],
+                                ),),
                               ],
                               elevation: 8.0,
                             ).then((value) async {
@@ -199,7 +223,7 @@ class ListDetailsCardFarmer extends StatelessWidget {
                     Align(
                       alignment: Alignment.topLeft,
                       child: Text(
-                        "This farmer is already linked with cropPlantingID of ${dataMap["cropPlantingId"]}",
+                        "This farmer is already linked with cropPlantingID of ${dataMap["Crop Planting Id:"]}",
                         style: TextStyle(fontSize: 11.5),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

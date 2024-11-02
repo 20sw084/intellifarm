@@ -16,7 +16,7 @@ class ConfirmDeleteFieldDialog extends StatelessWidget {
             Navigator.of(context).pop();
           },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.amber),
+            backgroundColor: WidgetStateProperty.all<Color>(Colors.amber),
           ),
           child: Text('Cancel', style: TextStyle(color: Colors.white),),
         ),
@@ -27,7 +27,7 @@ class ConfirmDeleteFieldDialog extends StatelessWidget {
             Navigator.of(context).pop();
           },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+            backgroundColor: WidgetStateProperty.all<Color>(Colors.red),
           ),
           child: Text(
             'Delete',
