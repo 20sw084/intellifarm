@@ -174,7 +174,7 @@ class AddCropVariety extends StatelessWidget {
 
       try {
         // crop name k basis per code lena h
-        String? cropId = await r.getCropIdByName("CropType.$cropName");
+        String? cropId = await r.getCropIdByName(cropName);
         if (id != null) {
           await r.usersRef.doc(id).collection('crops').doc(cropId).collection("varieties").add(
             c.getCropVarietyDataMap(),

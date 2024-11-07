@@ -22,27 +22,47 @@ class AddPlanting extends StatelessWidget {
   });
 
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _plantingDateController = TextEditingController();
+
   PlantingType? _plantingTypeController;
+
   String? _cropVariety;
+
   final TextEditingController _harvestingDateController =
       TextEditingController();
+
   final TextEditingController _quantityPlantedController =
       TextEditingController();
+
   final TextEditingController _estimatedYieldController =
       TextEditingController();
+
   final TextEditingController _distanceBetweenPlantsController =
       TextEditingController();
+
   final TextEditingController _seedCompanyController = TextEditingController();
+
   final TextEditingController _seedTypeController = TextEditingController();
+
   final TextEditingController _seedLotNumberController =
       TextEditingController();
+
   final TextEditingController _seedOriginController = TextEditingController();
+
   final TextEditingController _notesController = TextEditingController();
+
   DateTime? _selectedPlantingDate;
+
   DateTime? _selectedHarvestingDate;
 
   final ValueNotifier<String?> fieldNameNotifier = ValueNotifier<String?>(null);
+
+  final ValueNotifier<String?> cropNameNotifier = ValueNotifier<String?>(null);
+
+  final ValueNotifier<String?> cropVarietyNotifier =
+      ValueNotifier<String?>(null);
+
   final ValueNotifier<FieldStatusAfterPlanting?> fieldStatusNotifier =
       ValueNotifier<FieldStatusAfterPlanting?>(null);
 
@@ -74,7 +94,7 @@ class AddPlanting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    cropName = "CropType.$cropName";
+    cropNameNotifier.value = cropName;
     return Scaffold(
       appBar: AppBar(
         title: Text("New Planting"),
@@ -130,7 +150,6 @@ class AddPlanting extends StatelessWidget {
                     return null;
                   },
                   onChanged: (PlantingType? newValue) {
-                    // Do something with the selected value
                     _plantingTypeController = newValue;
                   },
                 ),
@@ -150,7 +169,7 @@ class AddPlanting extends StatelessWidget {
                                 border: OutlineInputBorder(),
                               ),
                               isExpanded: false,
-                              value: cropName,
+                              value: cropNameNotifier.value,
                               items: snapshot.data?.docs.map((value) {
                                 return DropdownMenuItem(
                                   value: value.get('name'),
@@ -164,6 +183,9 @@ class AddPlanting extends StatelessWidget {
                                 return null;
                               },
                               onChanged: (value) {
+                                _cropVariety = null;
+                                cropVarietyNotifier.value = null;
+                                cropNameNotifier.value = value.toString();
                                 cropName = value.toString();
                               },
                             );
@@ -195,67 +217,82 @@ class AddPlanting extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: getCropVarietyDataViaStream(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (!snapshot.hasData) return Container();
-                            return DropdownButtonFormField(
-                              decoration: const InputDecoration(
-                                labelText: 'Select Crop Variety *',
-                                border: OutlineInputBorder(),
-                              ),
-                              isExpanded: false,
-                              value: _cropVariety,
-                              items: snapshot.data?.docs.map((value) {
-                                return DropdownMenuItem(
-                                  value: value.get('varietyName'),
-                                  child: Text('${value.get('varietyName')}'),
-                                );
-                              }).toList(),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please select necessary fields';
-                                }
-                                return null;
-                              },
-                              onChanged: (value) {
-                                debugPrint('selected onchange: $value');
-                                _cropVariety = value.toString();
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        right: 8.0,
-                        left: 8.0,
-                      ),
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddCropVariety(
-                                cropName: cropName,
+                ValueListenableBuilder<String?>(
+                  valueListenable: cropNameNotifier,
+                  builder: (context, cropName, child) {
+                    if (cropName != null && cropName.isNotEmpty) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: getCropVarietyDataViaStream(),
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  }
+                                  if (snapshot.hasError) {
+                                    return Text("Error: ${snapshot.error}");
+                                  }
+                                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                    return Text("No crop varieties available");
+                                  }
+
+                                  return ValueListenableBuilder<String?>(
+                                    valueListenable: cropVarietyNotifier,
+                                    builder: (context, selectedVariety, _) {
+                                      return DropdownButtonFormField<String>(
+                                        decoration: const InputDecoration(
+                                          labelText: 'Select Crop Variety *',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        isExpanded: true,
+                                        value: selectedVariety,
+                                        items: snapshot.data!.docs.map((doc) {
+                                          String varietyName = doc.get('varietyName');
+                                          return DropdownMenuItem(
+                                            value: varietyName,
+                                            child: Text(varietyName),
+                                          );
+                                        }).toList(),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select a crop variety';
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (value) {
+                                          cropVarietyNotifier.value = value;
+                                          _cropVariety = value.toString();
+                                          debugPrint('Selected crop variety: $value');
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                             ),
-                          );
-                        },
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        backgroundColor: Colors.greenAccent,
-                      ),
-                    ),
-                  ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddCropVariety(cropName: cropName),
+                                  ),
+                                );
+                              },
+                              backgroundColor: Colors.greenAccent,
+                              child: Icon(Icons.add, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return SizedBox.shrink(); // Hide when no crop is selected
+                  },
                 ),
                 SizedBox(height: 30),
                 Row(
@@ -511,15 +548,11 @@ class AddPlanting extends StatelessWidget {
               );
 
           String? fieldId = await r.getFieldIdByName(c.fieldName!);
-          await r.usersRef
-              .doc(id)
-              .collection('fields')
-              .doc(fieldId)
-              .update(
-            {"fieldStatus" : fieldStatusNotifier.value.toString().split(".").last,}
-          );
+          await r.usersRef.doc(id).collection('fields').doc(fieldId).update({
+            "fieldStatus": fieldStatusNotifier.value.toString().split(".").last,
+          });
           Provider.of<FieldProvider>(context, listen: false).needsRefresh =
-          true;
+              true;
           print("Success: Planting added successfully.");
           Navigator.pop(context);
         } else {

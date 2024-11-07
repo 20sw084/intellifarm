@@ -308,7 +308,7 @@ class ViewCropDetails extends StatelessWidget {
                                                 width: 15,
                                               ),
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.6,child: Text("${dataMap["Name:"]} ${firestoreData?['varietyName']} (${firestoreData?['fieldName']})", maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                                        width: MediaQuery.of(context).size.width * 0.6,child: Text("${dataMap["Name:"].toString().split(".").last} :: ${firestoreData?['varietyName']} (${firestoreData?['fieldName']})", maxLines: 1, overflow: TextOverflow.ellipsis,)),
                                             ],
                                           ),
                                           IconButton(
@@ -382,7 +382,7 @@ class ViewCropDetails extends StatelessWidget {
                                   buildInfoRow("Status", firestoreData?['plantingType'].toString() ?? " "),
                                   buildInfoRow("Date", firestoreData?['plantingDate'].toString() ?? " "),
                                   buildInfoRow("Age", "$pdAge days"),  // Display the age in days
-                                  buildInfoRow("Field", "Badin"),
+                                  buildInfoRow("Field", firestoreData?['fieldName'].toString() ?? " "),
                                   buildInfoRow("Crop", dataMap["Name:"].toString().split(".").last),
                                   buildInfoRow("Distance", firestoreData?['distanceBetweenPlants'].toString() ?? " "),
                                   buildInfoRow("Planted", firestoreData?['quantityPlanted'].toString() ?? " "),

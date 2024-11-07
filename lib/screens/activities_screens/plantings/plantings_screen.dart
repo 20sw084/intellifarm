@@ -350,7 +350,7 @@ class PlantingsScreen extends StatelessWidget {
                         );
                         return SizedBox(
                           width: MediaQuery.of(context).size.width,
-                          height: 325,
+                          height: 260,
                           child: Card(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -376,7 +376,7 @@ class PlantingsScreen extends StatelessWidget {
                                                         .width *
                                                     0.6,
                                                 child: Text(
-                                                  "${plantingData["cropName"]} ${plantingData['varietyName']} (${plantingData['fieldName']})",
+                                                  "${plantingData["cropName"].toString().split(".").last} :: ${plantingData['varietyName']} (${plantingData['fieldName']})",
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -595,7 +595,7 @@ class PlantingsScreen extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        "${plantingData["cropName"]} (${plantingData["varietyName"]}) ",
+                                        "${plantingData["cropName"].toString().split(".").last} :: (${plantingData["varietyName"]}) ",
                                         style: TextStyle(
                                           fontSize: 12.5,
                                         ),
