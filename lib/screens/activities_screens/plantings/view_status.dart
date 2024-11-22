@@ -14,7 +14,8 @@ class ViewStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         title: const Text('View Status\''),
       ),
       body: FutureBuilder<List<QueryDocumentSnapshot>>(

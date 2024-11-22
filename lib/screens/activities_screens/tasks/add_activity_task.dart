@@ -46,7 +46,8 @@ class AddActivityTask extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("New Task"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {
@@ -237,7 +238,7 @@ class AddActivityTask extends StatelessWidget {
                             ),
                           );
                         },
-                        backgroundColor: Colors.greenAccent,
+                        backgroundColor: Color(0xff727530),
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,

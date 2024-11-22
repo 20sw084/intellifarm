@@ -18,7 +18,8 @@ class TasksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           Consumer<SearchProvider>(
             builder: (context, searchProvider, child) {
@@ -385,7 +386,7 @@ class TasksScreen extends StatelessWidget {
                           child: Column(
                             children: [
                               Container(
-                                color: Colors.greenAccent,
+                                color: Color(0xff727530),
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Row(
@@ -394,15 +395,15 @@ class TasksScreen extends StatelessWidget {
                                     children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.task),
+                                          Icon(Icons.task, color: Colors.white,),
                                           SizedBox(
                                             width: 15,
                                           ),
-                                          Text(t.taskName),
+                                          Text(t.taskName, style: TextStyle(color: Colors.white),),
                                         ],
                                       ),
                                       IconButton(
-                                          icon: Icon(Icons.more_vert),
+                                          icon: Icon(Icons.more_vert, color: Colors.white,),
                                           onPressed: () {
                                             showMenu(
                                               context: context,
@@ -567,6 +568,8 @@ class TasksScreen extends StatelessWidget {
                 builder: (context) => AddActivityTask(),
               ));
         },
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         icon: Icon(Icons.add),
         label: Text('Add'),
         tooltip: 'Add', // Tooltip text

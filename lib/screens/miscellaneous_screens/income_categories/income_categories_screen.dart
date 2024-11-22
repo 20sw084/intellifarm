@@ -81,7 +81,8 @@ class _IncomeCategoriesScreenState extends State<IncomeCategoriesScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           title: const Text('Income Categories'),
         ),
         body: FutureBuilder<List<QueryDocumentSnapshot>>(
@@ -123,6 +124,8 @@ class _IncomeCategoriesScreenState extends State<IncomeCategoriesScreen> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _showAddCategoryDialog,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           icon: const Icon(Icons.add),
           label: const Text('Add'),
           tooltip: 'Add',

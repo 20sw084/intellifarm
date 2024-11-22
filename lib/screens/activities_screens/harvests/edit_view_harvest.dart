@@ -60,7 +60,8 @@ class EditViewActivityHarvest extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit/View Harvest"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {

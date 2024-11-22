@@ -11,7 +11,8 @@ class MiscellaneousScreen extends StatelessWidget{
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           title: Text("Miscellaneous"),
         ),
         body: Padding(

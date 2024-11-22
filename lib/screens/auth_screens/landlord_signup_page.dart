@@ -52,9 +52,10 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xff727530),
         appBar: AppBar(
           elevation: 0,
+          foregroundColor: Colors.white,
           title: const Text('Landlord Sign-Up Page'),
         ),
         body: Form(
@@ -77,11 +78,11 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                       enabledBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
-                              color: Color(0xff00c39c), width: 2)),
+                              color: Color(0xff727530), width: 2)),
                       prefixIcon: const Icon(
                         Icons.email_outlined,
                         size: 30,
-                        color: Color(0xff00c39c),
+                        color: Color(0xff727530),
                       ),
                       hintText: 'EMAIL',
                       hintStyle:
@@ -98,11 +99,11 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                     enabledBorder: UnderlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                            color: Color(0xff00c39c), width: 2)),
+                            color: Color(0xff727530), width: 2)),
                     prefixIcon: const Icon(
                       Icons.phone_android_sharp,
                       size: 30,
-                      color: Color(0xff00c39c),
+                      color: Color(0xff727530),
                     ),
                     hintText: 'PHONE NUMBER',
                     hintStyle: const TextStyle(
@@ -122,11 +123,11 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                       enabledBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
-                              color: Color(0xff00c39c), width: 2)),
+                              color: Color(0xff727530), width: 2)),
                       prefixIcon: const Icon(
                         Icons.password_outlined,
                         size: 30,
-                        color: Color(0xff00c39c),
+                        color: Color(0xff727530),
                       ),
                       hintText: 'PASSWORD',
                       hintStyle:
@@ -143,14 +144,14 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                       enabledBorder: UnderlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: const BorderSide(
-                          color: Color(0xff00c39c),
+                          color: Color(0xff727530),
                           width: 2,
                         ),
                       ),
                       prefixIcon: const Icon(
                         Icons.password,
                         size: 30,
-                        color: Color(0xff00c39c),
+                        color: Color(0xff727530),
                       ),
                       hintText: 'CONFIRM PASSWORD',
                       hintStyle:
@@ -167,11 +168,11 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                   width: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(32),
-                    color: const Color(0xff00c39c),
+                    color: const Color(0xff727530),
                   ),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff00c39c),
+                      backgroundColor: const Color(0xff727530),
                       elevation: 2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32.0),

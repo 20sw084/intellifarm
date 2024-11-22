@@ -4,20 +4,26 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pdf/widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FarmersReportPdf {
-  Future<void> requestStoragePermission() async {
-    if (await Permission.storage.request().isGranted) {
-      // The permission is granted
+  /// Requests storage permissions and handles permission denial.
+  Future<bool> requestStoragePermission() async {
+    final status = await Permission.storage.request();
+    if (status.isGranted) {
       print("Permission Granted!");
+      return true;
+    } else if (status.isPermanentlyDenied) {
+      // Open app settings if permission is permanently denied
+      print("Permission Permanently Denied! Opening settings...");
+      await openAppSettings();
     } else {
-      // The permission is denied
       print("Permission Denied!");
     }
+    return false;
   }
 
+  /// Generates the farmers report as a PDF document.
   Future<Uint8List> generateReport(List<DocumentSnapshot> farmers) async {
     final pdf = pw.Document();
 
@@ -31,8 +37,8 @@ class FarmersReportPdf {
               pw.SizedBox(height: 16),
               pw.Text('Generated on: ${DateTime.now()}'),
               pw.SizedBox(height: 16),
-              TableHelper.fromTextArray(
-                headers: ['Farmer Name', 'Phone Number', 'CNIC Number', 'Unique Code', 'Share Rule', 'Linked Planting Id',],
+              pw.Table.fromTextArray(
+                headers: ['Farmer Name', 'Phone Number', 'CNIC Number', 'Unique Code', 'Share Rule', 'Linked Planting Id'],
                 data: farmers.map((farmerDoc) {
                   var farmerData = farmerDoc.data() as Map<String, dynamic>;
                   return [
@@ -55,18 +61,25 @@ class FarmersReportPdf {
       ),
     );
 
-    return pdf.save(); // Returns PDF file as bytes
+    return pdf.save(); // Returns the PDF file as bytes
   }
 
-  Future<String> savePdf(Uint8List pdfBytes, String fileName) async {
+  /// Saves the generated PDF to the user's device.
+  Future<String?> savePdf(Uint8List pdfBytes, String fileName) async {
     // Request storage permission
-    await requestStoragePermission();
+    if (!await requestStoragePermission()) {
+      print("Storage permission not granted. Cannot save file.");
+      return null;
+    }
 
+    // Get the app's documents directory (app-specific storage)
     final directory = await getApplicationDocumentsDirectory();
+
     final path = '${directory.path}/$fileName.pdf';
     final file = File(path);
     await file.writeAsBytes(pdfBytes);
 
+    print("PDF saved at: $path");
     return path;
   }
 }

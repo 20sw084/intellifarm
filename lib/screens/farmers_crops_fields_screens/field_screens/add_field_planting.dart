@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intellifarm/util/planting_type_enum.dart';
 import 'package:intl/intl.dart';
@@ -9,11 +10,10 @@ import '../../../providers/field_provider.dart';
 import '../../../util/field_status_after_planting_enum.dart';
 import '../crop_screens/add_crop_record.dart';
 import '../crop_screens/add_crop_variety.dart';
-import 'add_field_record.dart';
 
 class AddFieldPlanting extends StatefulWidget {
-  String fieldName;
-  AddFieldPlanting({
+  final String fieldName;
+  const AddFieldPlanting({
     super.key,
     required this.fieldName,
   });
@@ -82,7 +82,8 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
     return Scaffold(
       appBar: AppBar(
         title: Text("New Planting"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {
@@ -196,10 +197,11 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
                                 ),
                               );
                             },
-                            backgroundColor: Colors.greenAccent,
+                            backgroundColor: Color(0xff727530),
+                            foregroundColor: Colors.white,
                             child: const Icon(
                               Icons.add,
-                              color: Colors.white,
+                              // color: Colors.white,
                             ),
                           ),
                         ),
@@ -273,8 +275,9 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
                                       ),
                                     );
                                   },
-                                  backgroundColor: Colors.greenAccent,
-                                  child: Icon(Icons.add, color: Colors.white),
+                                  backgroundColor: Color(0xff727530),
+                                  foregroundColor: Colors.white,
+                                  child: Icon(Icons.add),
                                 ),
                               ),
                             ],
@@ -288,57 +291,13 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
                       children: [
                         Expanded(
                           child: Center(
-                            child: StreamBuilder<QuerySnapshot>(
-                              stream: getFieldDataViaStream(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (!snapshot.hasData) return Container();
-                                return DropdownButtonFormField(
-                                  decoration: const InputDecoration(
-                                    labelText: 'Select Field *',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  isExpanded: false,
-                                  value: widget.fieldName,
-                                  items: snapshot.data?.docs.map((value) {
-                                    return DropdownMenuItem(
-                                      value: value.get('name'),
-                                      child: Text('${value.get('name')}'),
-                                    );
-                                  }).toList(),
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Please select necessary fields';
-                                    }
-                                    return null;
-                                  },
-                                  onChanged: (value) {
-                                    // debugPrint('selected onchange: $value');
-                                    widget.fieldName = value.toString();
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            right: 8.0,
-                            left: 8.0,
-                          ),
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddFieldRecord(),
-                                ),
-                              );
-                            },
-                            backgroundColor: Colors.greenAccent,
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.white,
+                            child: TextFormField(
+                              initialValue: widget.fieldName,
+                              decoration: InputDecoration(
+                                labelText: 'Field Name',
+                                border: OutlineInputBorder(),
+                              ),
+                              readOnly: true,
                             ),
                           ),
                         ),
@@ -365,7 +324,6 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
                         return null;
                       },
                       onChanged: (FieldStatusAfterPlanting? newValue) {
-                        // Do something with the selected value
                         _fieldStatusAfterPlantingController = newValue;
                       },
                     ),
@@ -530,14 +488,19 @@ class AddFieldPlantingState extends State<AddFieldPlanting> {
             "fieldStatus":
             _fieldStatusAfterPlantingController.toString().split(".").last,
           });
+
           Provider.of<FieldProvider>(context, listen: false).needsRefresh =
           true;
           Navigator.pop(context);
         } else {
-          print("Error: User ID is null");
+          if (kDebugMode) {
+            print("Error: User ID is null");
+          }
         }
       } catch (e) {
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
       } finally {
         _isLoadingNotifier.value = false;
       }

@@ -81,7 +81,8 @@ class _ExpenseCategoriesScreenState extends State<ExpenseCategoriesScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           title: const Text('Expense Categories'),
         ),
         body: FutureBuilder<List<QueryDocumentSnapshot>>(
@@ -123,6 +124,8 @@ class _ExpenseCategoriesScreenState extends State<ExpenseCategoriesScreen> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _showAddCategoryDialog,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           icon: const Icon(Icons.add),
           label: const Text('Add'),
           tooltip: 'Add',

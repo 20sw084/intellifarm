@@ -104,7 +104,8 @@ class FarmerDashboardState extends State<FarmerDashboard> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          foregroundColor: Colors.white,
+          backgroundColor: Color(0xff727530),
           leading: Builder(
             builder: (context) => IconButton(
               onPressed: () {
@@ -126,7 +127,7 @@ class FarmerDashboardState extends State<FarmerDashboard> {
               children: [
                 const CircleAvatar(
                   radius: 80,
-                  backgroundColor: Color(0xff00c39c),
+                  backgroundColor: Color(0xff727530),
                   child: CircleAvatar(
                     radius: 75,
                     backgroundImage: NetworkImage(
@@ -135,7 +136,7 @@ class FarmerDashboardState extends State<FarmerDashboard> {
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: Icon(Icons.edit, color: Colors.greenAccent),
+                  leading: Icon(Icons.edit, color: Color(0xff727530)),
                   title: Text('Edit Profile'),
                   onTap: () {
                     print('Edit Profile clicked');
@@ -143,7 +144,7 @@ class FarmerDashboardState extends State<FarmerDashboard> {
                 ),
                 Spacer(),
                 ListTile(
-                  leading: Icon(Icons.logout, color: Colors.greenAccent),
+                  leading: Icon(Icons.logout, color: Color(0xff727530)),
                   title: Text('Logout'),
                   onTap: () {
                     logout(context);
@@ -190,6 +191,8 @@ class FarmerDashboardState extends State<FarmerDashboard> {
             // Add your onPressed action here
             print('Button pressed!');
           },
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           icon: Icon(Icons.refresh),
           label: Text('Sync Data'),
           tooltip: 'Sync Data', // Tooltip text
@@ -210,12 +213,13 @@ class ViewImageScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         elevation: 0,
         title: Text("View $type Image"),
         actions: [
           IconButton(
-            icon: Icon(Icons.done, color: Colors.blue, size: 30),
+            icon: Icon(Icons.done, color: Colors.white, size: 30),
             onPressed: () async {
               // Call saveImage with context and type
               await _saveImage(context, type);

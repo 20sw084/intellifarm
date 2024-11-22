@@ -53,7 +53,8 @@ class EditFieldRecord extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Field"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {
@@ -76,7 +77,7 @@ class EditFieldRecord extends StatelessWidget {
                     TextFormField(
                       controller: _fieldNameController,
                       decoration: InputDecoration(
-                        labelText: 'Name of Field  *',
+                        labelText: 'Name of Field / Survey Number *',
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {

@@ -56,7 +56,8 @@ class EditActivityTask extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Task"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {
@@ -259,7 +260,7 @@ class EditActivityTask extends StatelessWidget {
                             ),
                           );
                         },
-                        backgroundColor: Colors.greenAccent,
+                        backgroundColor: Color(0xff727530),
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,

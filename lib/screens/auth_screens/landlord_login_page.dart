@@ -16,21 +16,20 @@ class LandlordLoginPage extends StatefulWidget {
 
 class _LandlordLoginPageState extends State<LandlordLoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   final TextEditingController _email = TextEditingController();
-
   final TextEditingController _password = TextEditingController();
-
   AuthService authService = AuthService();
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
           elevation: 0,
           title: const Text('Landlord Login Page'),
+          backgroundColor: const Color(0xff727530),
+          foregroundColor: Colors.white,
         ),
         body: Form(
           key: _formKey,
@@ -41,9 +40,7 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(),
-                const SizedBox(
-                  height: 26,
-                ),
+                const SizedBox(height: 26),
                 TextFormField(
                   controller: _email,
                   validator: (value) {
@@ -56,14 +53,14 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
                     enabledBorder: UnderlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(
-                        color: Color(0xff00c39c),
+                        color: Color(0xff727530),
                         width: 2,
                       ),
                     ),
                     prefixIcon: const Icon(
                       Icons.phone_android_sharp,
                       size: 30,
-                      color: Color(0xff00c39c),
+                      color: Color(0xff727530),
                     ),
                     hintText: 'Email',
                     hintStyle: const TextStyle(
@@ -72,11 +69,10 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12),
                 TextFormField(
                   controller: _password,
+                  obscureText: !_isPasswordVisible,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Password is required";
@@ -87,14 +83,25 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
                     enabledBorder: UnderlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(
-                        color: Color(0xff00c39c),
+                        color: Color(0xff727530),
                         width: 2,
                       ),
                     ),
                     prefixIcon: const Icon(
                       Icons.password_outlined,
                       size: 30,
-                      color: Color(0xff00c39c),
+                      color: Color(0xff727530),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        color: Color(0xff727530),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
                     ),
                     hintText: 'Password',
                     hintStyle: const TextStyle(
@@ -103,26 +110,25 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 6,
-                ),
+                const SizedBox(height: 6),
                 TextButton(
                   onPressed: () {},
-                  child: const Text('Forgot Password?'),
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
-                const SizedBox(
-                  height: 6,
-                ),
+                const SizedBox(height: 6),
                 Container(
                   height: 50,
                   width: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(32),
-                    color: const Color(0xff00c39c),
+                    color: const Color(0xff727530),
                   ),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff00c39c),
+                      backgroundColor: const Color(0xff727530),
                       elevation: 2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32.0),
@@ -130,15 +136,6 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
                     ),
                     onPressed: () async {
                       await _submitForm();
-                      //     .whenComplete(() {
-                      //   Navigator.pushReplacement(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => const LandlordDashboard(),
-                      //     ),
-                      //   );
-                      //   return null;
-                      // });
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
@@ -160,11 +157,8 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
                       ),
                     );
                   },
-                  style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey.shade600),
-                  child: const Text(
-                    'New User? Create an Account',
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey.shade600),
+                  child: const Text('New User? Create an Account'),
                 ),
               ],
             ),
@@ -176,11 +170,9 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Perform sign-in logic here
       log('Email: ${_email.text}');
       await signIn();
 
-      // Check if the user is authenticated before navigating
       if (FirebaseAuth.instance.currentUser != null) {
         Navigator.pushReplacement(
           context,
@@ -189,7 +181,6 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
           ),
         );
       } else {
-        // Show a snackbar or other UI feedback for failed authentication
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Sign In Failed. Please check your credentials.'),
@@ -209,15 +200,6 @@ class _LandlordLoginPageState extends State<LandlordLoginPage> {
       saveLandlordId(_email.text);
       SharedPreferences sp = await SharedPreferences.getInstance();
       sp.setString('name', "landlord");
-      // SchedulerBinding.instance!.addPostFrameCallback((_) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(
-      //       content: Text(
-      //         "Sign In Successful",
-      //       ),
-      //     ),
-      //   );
-      // });
     }
   }
 }

@@ -17,7 +17,8 @@ class ViewReceipts extends StatelessWidget {
       length: 3, // Number of tabs
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           title: const Text('View Receipts'),
           bottom: const TabBar(
             tabs: [

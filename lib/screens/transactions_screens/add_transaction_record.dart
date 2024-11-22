@@ -55,7 +55,8 @@ class AddTransactionRecord extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("New $type"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
               onPressed: () {
@@ -312,7 +313,7 @@ class AddTransactionRecord extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                backgroundColor: Colors.greenAccent,
+                                backgroundColor: Color(0xff727530),
                                 child: const Icon(
                                   Icons.add,
                                   color: Colors.white,
@@ -421,7 +422,7 @@ class AddTransactionRecord extends StatelessWidget {
                                   ),
                                 );
                               },
-                              backgroundColor: Colors.greenAccent,
+                              backgroundColor: Color(0xff727530),
                               child: const Icon(
                                 Icons.add,
                                 color: Colors.white,

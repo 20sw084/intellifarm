@@ -26,7 +26,8 @@ class ViewCropDetails extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.greenAccent,
+            backgroundColor: Color(0xff727530),
+            foregroundColor: Colors.white,
             title: Text(dataMap["Name:"].toString().split(".").last),
             // title: Text(values!.first),
             bottom: TabBar(

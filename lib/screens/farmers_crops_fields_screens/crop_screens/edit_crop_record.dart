@@ -24,7 +24,7 @@ class EditCropRecord extends StatelessWidget {
     _notesController.text = dataMap["Notes:"];
     _selectedUnitNotifier = ValueNotifier<Units>(
       Units.values.firstWhere(
-            (unit) => unit.toString().split('.')[1] == dataMap["Harvest Unit:"].toString().split('.')[1],
+            (unit) => unit.toString().split('.')[1] == dataMap["Harvest Unit:"].toString(),
         orElse: () => Units.values.first, // Provide a default value
       ),
     );
@@ -39,7 +39,8 @@ class EditCropRecord extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Crop"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {

@@ -32,7 +32,8 @@ class ViewFieldDetails extends StatelessWidget {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.greenAccent,
+            backgroundColor: Color(0xff727530),
+            foregroundColor: Colors.white,
             title: Text(dataMap["Name:"]),
             bottom: TabBar(
               isScrollable: true,
@@ -234,7 +235,7 @@ class ViewFieldDetails extends StatelessWidget {
                               child: Column(
                                 children: [
                                   Container(
-                                    color: Colors.greenAccent,
+                                    color: Color(0xff727530),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 8.0),
                                       child: Row(

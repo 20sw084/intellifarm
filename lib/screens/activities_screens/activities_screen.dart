@@ -13,7 +13,8 @@ class ActivitiesScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           title: Text("Activities"),
         ),
         body: Padding(

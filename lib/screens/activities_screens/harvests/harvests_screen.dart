@@ -36,7 +36,8 @@ class _HarvestsScreenState extends State<HarvestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           Consumer<SearchProvider>(
             builder: (context, searchProvider, child) {
@@ -286,7 +287,8 @@ class _HarvestsScreenState extends State<HarvestsScreen> {
                           child: Column(
                             children: [
                               Container(
-                                color: Colors.greenAccent,
+                                color: Color(0xff727530),
+                                // foregroundDecoration: ,
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Row(
@@ -295,24 +297,34 @@ class _HarvestsScreenState extends State<HarvestsScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.cut),
+                                          Icon(
+                                            Icons.cut,
+                                            color: Colors.white,
+                                          ),
                                           SizedBox(
                                             width: 15,
                                           ),
                                           SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.6,
-                                              child: Text(
-                                                h.plantingToHarvest!,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              )),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.6,
+                                            child: Text(
+                                              h.plantingToHarvest!,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       IconButton(
-                                          icon: Icon(Icons.more_vert),
+                                          icon: Icon(
+                                            Icons.more_vert,
+                                            color: Colors.white,
+                                          ),
                                           onPressed: () {
                                             showMenu(
                                               context: context,
@@ -573,6 +585,8 @@ class _HarvestsScreenState extends State<HarvestsScreen> {
                 builder: (context) => AddActivityHarvest(),
               ));
         },
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         icon: Icon(Icons.add),
         label: Text('Add'),
         tooltip: 'Add', // Tooltip text

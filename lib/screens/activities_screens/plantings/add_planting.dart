@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../controller/references.dart';
 import '../../../models/crops/cropPlanting.dart';
 import '../../../providers/field_provider.dart';
+import '../../../providers/planting_provider.dart';
 import '../../../util/common_methods.dart';
 import '../../../util/field_status_after_planting_enum.dart';
 import '../../farmers_crops_fields_screens/crop_screens/add_crop_variety.dart';
@@ -15,63 +16,44 @@ import '../../farmers_crops_fields_screens/crop_screens/add_crop_variety.dart';
 class AddPlanting extends StatelessWidget {
   String cropName;
   late String? fieldName;
+
   AddPlanting({
     super.key,
     required this.cropName,
     this.fieldName,
   });
-
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _plantingDateController = TextEditingController();
-
   PlantingType? _plantingTypeController;
-
   String? _cropVariety;
-
   final TextEditingController _harvestingDateController =
       TextEditingController();
-
   final TextEditingController _quantityPlantedController =
       TextEditingController();
-
   final TextEditingController _estimatedYieldController =
       TextEditingController();
-
   final TextEditingController _distanceBetweenPlantsController =
       TextEditingController();
-
   final TextEditingController _seedCompanyController = TextEditingController();
-
   final TextEditingController _seedTypeController = TextEditingController();
-
   final TextEditingController _seedLotNumberController =
       TextEditingController();
-
   final TextEditingController _seedOriginController = TextEditingController();
-
   final TextEditingController _notesController = TextEditingController();
-
   DateTime? _selectedPlantingDate;
-
   DateTime? _selectedHarvestingDate;
-
   final ValueNotifier<String?> fieldNameNotifier = ValueNotifier<String?>(null);
-
   final ValueNotifier<String?> cropNameNotifier = ValueNotifier<String?>(null);
-
   final ValueNotifier<String?> cropVarietyNotifier =
       ValueNotifier<String?>(null);
-
   final ValueNotifier<FieldStatusAfterPlanting?> fieldStatusNotifier =
       ValueNotifier<FieldStatusAfterPlanting?>(null);
-
   Future<void> _selectPlantingDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedPlantingDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2040),
     );
     if (picked != null && picked != _selectedPlantingDate) {
       _selectedPlantingDate = picked;
@@ -98,7 +80,8 @@ class AddPlanting extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("New Planting"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {
@@ -207,7 +190,8 @@ class AddPlanting extends StatelessWidget {
                             ),
                           );
                         },
-                        backgroundColor: Colors.greenAccent,
+                        backgroundColor: Color(0xff727530),
+                        foregroundColor: Colors.white,
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,
@@ -227,17 +211,19 @@ class AddPlanting extends StatelessWidget {
                             child: Center(
                               child: StreamBuilder<QuerySnapshot>(
                                 stream: getCropVarietyDataViaStream(),
-                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
                                     return CircularProgressIndicator();
                                   }
                                   if (snapshot.hasError) {
                                     return Text("Error: ${snapshot.error}");
                                   }
-                                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                  if (!snapshot.hasData ||
+                                      snapshot.data!.docs.isEmpty) {
                                     return Text("No crop varieties available");
                                   }
-
                                   return ValueListenableBuilder<String?>(
                                     valueListenable: cropVarietyNotifier,
                                     builder: (context, selectedVariety, _) {
@@ -249,7 +235,8 @@ class AddPlanting extends StatelessWidget {
                                         isExpanded: true,
                                         value: selectedVariety,
                                         items: snapshot.data!.docs.map((doc) {
-                                          String varietyName = doc.get('varietyName');
+                                          String varietyName =
+                                              doc.get('varietyName');
                                           return DropdownMenuItem(
                                             value: varietyName,
                                             child: Text(varietyName),
@@ -264,7 +251,8 @@ class AddPlanting extends StatelessWidget {
                                         onChanged: (value) {
                                           cropVarietyNotifier.value = value;
                                           _cropVariety = value.toString();
-                                          debugPrint('Selected crop variety: $value');
+                                          debugPrint(
+                                              'Selected crop variety: $value');
                                         },
                                       );
                                     },
@@ -274,17 +262,19 @@ class AddPlanting extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                            padding:
+                                const EdgeInsets.only(left: 8.0, right: 8.0),
                             child: FloatingActionButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => AddCropVariety(cropName: cropName),
+                                    builder: (context) =>
+                                        AddCropVariety(cropName: cropName),
                                   ),
                                 );
                               },
-                              backgroundColor: Colors.greenAccent,
+                              backgroundColor: Color(0xff727530),
                               child: Icon(Icons.add, color: Colors.white),
                             ),
                           ),
@@ -346,7 +336,7 @@ class AddPlanting extends StatelessWidget {
                             ),
                           );
                         },
-                        backgroundColor: Colors.greenAccent,
+                        backgroundColor: Color(0xff727530),
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,
@@ -530,39 +520,64 @@ class AddPlanting extends StatelessWidget {
     );
 
     if (_formKey.currentState!.validate()) {
-      // Form is valid, proceed with saving data
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 15),
+                Text("Saving...", style: TextStyle(color: Colors.white)),
+              ],
+            ),
+          );
+        },
+      );
+
       References r = References();
       String? id = await r.getLoggedUserId();
 
       try {
-        // crop name k basis per code lena h
         String? cropId = await r.getCropIdByName(cropName);
         if (id != null) {
-          await r.usersRef
+          DocumentReference docRef = await r.usersRef
               .doc(id)
               .collection('crops')
               .doc(cropId)
               .collection("plantings")
-              .add(
-                c.getCropPlantingDataMap(),
-              );
+              .add(c.getCropPlantingDataMap());
 
+          // Fetch the newly added planting document
+          DocumentSnapshot newPlanting = await docRef.get();
+
+          // Notify the PlantingProvider
+          Provider.of<PlantingProvider>(context, listen: false)
+              .addPlanting(newPlanting);
+
+          // Update field status
           String? fieldId = await r.getFieldIdByName(c.fieldName!);
           await r.usersRef.doc(id).collection('fields').doc(fieldId).update({
             "fieldStatus": fieldStatusNotifier.value.toString().split(".").last,
           });
+
           Provider.of<FieldProvider>(context, listen: false).needsRefresh =
               true;
-          print("Success: Planting added successfully.");
+          Navigator.pop(context);
           Navigator.pop(context);
         } else {
           print("Error: User ID is null");
+          Navigator.pop(context);
         }
       } catch (e) {
         print(e);
+        Navigator.pop(context); // Close the dialog
       }
     }
   }
 }
-
 // TODO: fields 2bara na aaen jab fully cultivate wala scene hojaye. y check khan lagana h dekhlena : app se dekho pehle

@@ -15,7 +15,8 @@ class LandlordDashboard extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           leading: Builder(
             builder: (context) => IconButton(
               onPressed: () {
@@ -47,7 +48,9 @@ class LandlordDashboard extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 80,
-                  backgroundColor: Color(0xff00c39c),
+                  // backgroundColor: Color(0xff00c39c),
+                  backgroundColor: Color(0xff727530),
+                  foregroundColor: Colors.white,
                   child: CircleAvatar(
                     radius: 75,
                     backgroundImage: NetworkImage(
@@ -57,7 +60,7 @@ class LandlordDashboard extends StatelessWidget {
                 const SizedBox(height: 20),
                 // Edit Profile Button
                 ListTile(
-                  leading: Icon(Icons.edit, color: Colors.greenAccent),
+                  leading: Icon(Icons.edit, color: Color(0xff727530)),
                   title: Text('Edit Profile'),
                   onTap: () {
                     // Handle edit profile action
@@ -68,7 +71,7 @@ class LandlordDashboard extends StatelessWidget {
                 Spacer(),
                 // Logout Button
                 ListTile(
-                  leading: Icon(Icons.logout, color: Colors.greenAccent),
+                  leading: Icon(Icons.logout, color: Color(0xff727530)),
                   title: Text('Logout'),
                   onTap: () {
                     logout(context);

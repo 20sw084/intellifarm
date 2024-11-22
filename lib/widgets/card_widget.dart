@@ -35,10 +35,12 @@ class CardWidget extends StatelessWidget {
                     Icon(
                       logo,
                       size: 100,
+                      color: Color(0xff727530),
                     ),
                     Text(
                       text,
                       style: TextStyle(
+                        color: Color(0xff727530),
                         fontSize: 14,
                       ),
                     ),

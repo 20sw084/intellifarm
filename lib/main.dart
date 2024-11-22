@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intellifarm/providers/crop_provider.dart';
 import 'package:intellifarm/providers/farmer_provider.dart';
 import 'package:intellifarm/providers/field_provider.dart';
+import 'package:intellifarm/providers/planting_provider.dart';
 import 'package:intellifarm/providers/search_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -29,6 +30,7 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => CropProvider()..fetchCropsData()),
         ChangeNotifierProvider(create: (_) => FarmerProvider()..fetchFarmersData()),
         ChangeNotifierProvider(create: (_) => FieldProvider()..fetchFieldsData()),
+        ChangeNotifierProvider(create: (_) => PlantingProvider()..fetchPlantings()),
       ],
       child: MyApp(),
     ),

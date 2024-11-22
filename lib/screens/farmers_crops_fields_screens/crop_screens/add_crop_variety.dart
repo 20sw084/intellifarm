@@ -23,7 +23,8 @@ class AddCropVariety extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("New Crop Variety"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
               onPressed: () {
@@ -42,7 +43,7 @@ class AddCropVariety extends StatelessWidget {
                 SizedBox(height: 30),
                 Container(
                   height: 35,
-                  color: Colors.greenAccent,
+                  color: Color(0xff727530),
                   child: Row(
                     children: [
                       SizedBox(width: 10),

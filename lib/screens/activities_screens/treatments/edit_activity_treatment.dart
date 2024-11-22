@@ -58,7 +58,8 @@ class EditActivityTreatment extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Treatment"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () {
@@ -191,7 +192,7 @@ class EditActivityTreatment extends StatelessWidget {
                             ),
                           );
                         },
-                        backgroundColor: Colors.greenAccent,
+                        backgroundColor: Color(0xff727530),
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,

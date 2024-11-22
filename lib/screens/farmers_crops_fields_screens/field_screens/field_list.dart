@@ -20,7 +20,8 @@ class FieldList extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             Consumer<SearchProvider>(
               builder: (context, searchProvider, _) => IconButton(
@@ -33,11 +34,11 @@ class FieldList extends StatelessWidget {
             ),
             IconButton(
               onPressed: null,
-              icon: Icon(Icons.remove_red_eye_sharp),
+              icon: Icon(Icons.remove_red_eye_sharp, color: Colors.white,),
             ),
             IconButton(
               onPressed: null,
-              icon: Icon(Icons.print),
+              icon: Icon(Icons.print, color: Colors.white),
             ),
           ],
           title: Consumer<SearchProvider>(
@@ -160,6 +161,8 @@ class FieldList extends StatelessWidget {
               Provider.of<FieldProvider>(context, listen: false).needsRefresh = true;
             });
           },
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           icon: Icon(Icons.add),
           label: Text('Add'),
           tooltip: 'Add',

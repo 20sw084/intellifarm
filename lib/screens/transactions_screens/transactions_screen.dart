@@ -50,7 +50,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             IconButton(
               onPressed: () {
@@ -299,13 +300,15 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                 )
               : Text("Transactions"),
           bottom: TabBar(
+            unselectedLabelColor: Colors.grey,
+            labelColor: Colors.white,
             controller: _tabController,
             isScrollable: true,
             tabs: [
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.30,
                 child: Tab(
-                  text: 'Income',
+                  text: 'Income', 
                 ),
               ),
               SizedBox(
@@ -769,6 +772,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>
             return SizedBox(
               width: 100,
               child: FloatingActionButton(
+                backgroundColor: Color(0xff727530),
+                foregroundColor: Colors.white,
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -784,7 +789,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add),
+                    Icon(Icons.add, ),
                     SizedBox(width: 4),
                     Text(value ? "Income" : "Expense"),
                   ],

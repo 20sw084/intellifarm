@@ -20,7 +20,8 @@ class FarmerList extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             Consumer<SearchProvider>(
               builder: (context, searchProvider, _) => IconButton(
@@ -131,6 +132,8 @@ class FarmerList extends StatelessWidget {
               Provider.of<FarmerProvider>(context, listen: false).needsRefresh = true;
             });
           },
+          foregroundColor: Colors.white,
+          backgroundColor: Color(0xff727530),
           icon: const Icon(Icons.add),
           label: const Text('Add'),
           tooltip: 'Add',

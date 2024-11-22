@@ -25,7 +25,8 @@ class AddFarmerRecord extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("New Farmer"),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () async {

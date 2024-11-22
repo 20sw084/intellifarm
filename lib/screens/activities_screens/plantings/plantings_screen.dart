@@ -7,6 +7,7 @@ import 'package:intellifarm/screens/activities_screens/plantings/view_receipts.d
 import 'package:intellifarm/screens/activities_screens/plantings/view_status.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/search_provider.dart';
+import '../../../providers/planting_provider.dart';
 import '../../../util/common_methods.dart';
 import '../tasks/add_activity_task.dart';
 import '../treatments/add_activity_treatment.dart';
@@ -15,7 +16,7 @@ import 'add_planting.dart';
 class PlantingsScreen extends StatelessWidget {
   PlantingsScreen({super.key});
 
-  List<String> keys = [
+  final List<String> keys = [
     "Status:",
     "Date:",
     "Age:",
@@ -36,12 +37,17 @@ class PlantingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SearchProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(
+            create: (_) => PlantingProvider()..fetchPlantings()),
+      ],
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.greenAccent,
+            backgroundColor: Color(0xff727530),
+            foregroundColor: Colors.white,
             actions: [
               Consumer<SearchProvider>(
                 builder: (context, searchProvider, child) {
@@ -267,51 +273,46 @@ class PlantingsScreen extends StatelessWidget {
               builder: (context, searchProvider, child) {
                 return searchProvider.searchFlag
                     ? Container(
-                  width: double.infinity,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Center(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) {
-                        searchProvider.updateSearchQuery(value);
-                      },
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            searchProvider.clearSearch();
-                            _searchController.clear();
-                          },
+                        width: double.infinity,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        hintText: 'Search...',
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                )
+                        child: Center(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: (value) {
+                              searchProvider.updateSearchQuery(value);
+                            },
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  searchProvider.clearSearch();
+                                  _searchController.clear();
+                                },
+                              ),
+                              hintText: 'Search...',
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      )
                     : const Text("Plantings");
               },
             ),
           ),
-          body: FutureBuilder<List<DocumentSnapshot>>(
-            future:
-                getAllPlantings(), // Use the function that returns List<DocumentSnapshot>
-            builder: (BuildContext context,
-                AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          body: Consumer<PlantingProvider>(
+            builder: (context, plantingProvider, child) {
+              if (plantingProvider.plantings.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error is: ${snapshot.error}"));
-              } else if (snapshot.hasData) {
-                List<DocumentSnapshot> plantings = snapshot.data!;
+              } else {
                 return Consumer<SearchProvider>(
                   builder: (context, searchProvider, child) {
                     // Filter documents based on search query
-                    var filteredDocuments = plantings.where((doc) {
+                    var filteredDocuments =
+                        plantingProvider.plantings.where((doc) {
                       var data = doc.data() as Map<String, dynamic>;
                       return data['cropName']
                           .toString()
@@ -321,10 +322,10 @@ class PlantingsScreen extends StatelessWidget {
                     return ListView.builder(
                       itemCount: filteredDocuments.length,
                       itemBuilder: (context, index) {
-                        var plantingData =
-                        filteredDocuments[index].data() as Map<String, dynamic>;
+                        var plantingData = filteredDocuments[index].data()
+                            as Map<String, dynamic>;
                         cropName = plantingData["cropName"];
-                        String plantingId = plantings[index].id;
+                        String plantingId = filteredDocuments[index].id;
                         final String plantingDateString =
                             plantingData['plantingDate'].toString();
                         DateTime plantingDate =
@@ -350,14 +351,14 @@ class PlantingsScreen extends StatelessWidget {
                         );
                         return SizedBox(
                           width: MediaQuery.of(context).size.width,
-                          height: 260,
+                          height: 255,
                           child: Card(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 children: [
                                   Container(
-                                    color: Colors.greenAccent,
+                                    color: Color(0xff727530),
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 8.0),
                                       child: Row(
@@ -366,7 +367,7 @@ class PlantingsScreen extends StatelessWidget {
                                         children: [
                                           Row(
                                             children: [
-                                              Icon(Icons.forest),
+                                              Icon(Icons.forest, color: Colors.white,),
                                               SizedBox(
                                                 width: 15,
                                               ),
@@ -380,12 +381,14 @@ class PlantingsScreen extends StatelessWidget {
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
+                                                  style: TextStyle(color: Colors.white,),
                                                 ),
                                               ),
                                             ],
                                           ),
                                           IconButton(
                                               icon: Icon(Icons.more_vert),
+                                              color: Colors.white,
                                               onPressed: () {
                                                 showMenu(
                                                   context: context,
@@ -703,8 +706,6 @@ class PlantingsScreen extends StatelessWidget {
                     );
                   },
                 );
-              } else {
-                return const Center(child: Text("No plantings available"));
               }
             },
           ),
@@ -720,6 +721,8 @@ class PlantingsScreen extends StatelessWidget {
                   ));
               print('Button pressed!');
             },
+            backgroundColor: Color(0xff727530),
+            foregroundColor: Colors.white,
             icon: Icon(Icons.add),
             label: Text('Add'),
             tooltip: 'Add', // Tooltip text

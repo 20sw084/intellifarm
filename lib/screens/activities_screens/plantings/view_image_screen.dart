@@ -12,7 +12,8 @@ class ViewImageScreen extends StatelessWidget {
     bool isNetworkImage = imageFile.startsWith('http') || imageFile.startsWith('https');
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Color(0xff727530),
+        foregroundColor: Colors.white,
         elevation: 0,
         title: Text("View $type Image"),
       ),

@@ -11,7 +11,8 @@ class WhoIsUsing extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           title: Center(child: Text("Who is Using?")),
         ),
         body: SingleChildScrollView(

@@ -16,7 +16,8 @@ class CropList extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             Consumer<SearchProvider>(
               builder: (context, searchProvider, _) => IconButton(
@@ -28,7 +29,7 @@ class CropList extends StatelessWidget {
             ),
             const IconButton(
               onPressed: null,
-              icon: Icon(Icons.print),
+              icon: Icon(Icons.print, color: Colors.white,),
             ),
           ],
           title: Consumer<SearchProvider>(
@@ -116,6 +117,8 @@ class CropList extends StatelessWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           onPressed: () {
             Navigator.push(
               context,
