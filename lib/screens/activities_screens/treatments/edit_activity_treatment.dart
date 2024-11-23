@@ -55,258 +55,260 @@ class EditActivityTreatment extends StatelessWidget {
     _selectedTreatmentType.value = treatment.treatmentType;
     _selectedFieldName = treatment.fieldName;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Treatment"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _saveForm(context);
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _treatmentDateController,
-                  onTap: () => _selectDate(context),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Treatment Date *',
-                    border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Edit Treatment"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {
+                _saveForm(context);
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _treatmentDateController,
+                    onTap: () => _selectDate(context),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Treatment Date *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                DropdownButtonFormField<TreatmentStatus>(
-                  value: _selectedTreatmentStatus.value,
-                  decoration: InputDecoration(
-                    labelText: 'Select Status of Treatment *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<TreatmentStatus>(
+                    value: _selectedTreatmentStatus.value,
+                    decoration: InputDecoration(
+                      labelText: 'Select Status of Treatment *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: TreatmentStatus.values
+                        .map((option) => DropdownMenuItem<TreatmentStatus>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TreatmentStatus? newValue) {
+                      _selectedTreatmentStatus.value = newValue;
+                    },
                   ),
-                  items: TreatmentStatus.values
-                      .map((option) => DropdownMenuItem<TreatmentStatus>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (TreatmentStatus? newValue) {
-                    _selectedTreatmentStatus.value = newValue;
-                  },
-                ),
-                SizedBox(height: 30),
-                DropdownButtonFormField<TreatmentType>(
-                  value: _selectedTreatmentType.value,
-                  decoration: InputDecoration(
-                    labelText: 'Select Treatment Type *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<TreatmentType>(
+                    value: _selectedTreatmentType.value,
+                    decoration: InputDecoration(
+                      labelText: 'Select Treatment Type *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: TreatmentType.values
+                        .map((option) => DropdownMenuItem<TreatmentType>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TreatmentType? newValue) {
+                      _selectedTreatmentType.value = newValue;
+                    },
                   ),
-                  items: TreatmentType.values
-                      .map((option) => DropdownMenuItem<TreatmentType>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (TreatmentType? newValue) {
-                    _selectedTreatmentType.value = newValue;
-                  },
-                ),
-                SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: getFieldDataViaStream(),
-                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (!snapshot.hasData) return Container();
-
-                            // Define a list of dropdown items
-                            List<DropdownMenuItem<String>> items = snapshot.data?.docs.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value.get('name'),
-                                child: Text('${value.get('name')}'),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: getFieldDataViaStream(),
+                            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (!snapshot.hasData) return Container();
+      
+                              // Define a list of dropdown items
+                              List<DropdownMenuItem<String>> items = snapshot.data?.docs.map((value) {
+                                return DropdownMenuItem<String>(
+                                  value: value.get('name'),
+                                  child: Text('${value.get('name')}'),
+                                );
+                              }).toList() ?? [];
+      
+                              return DropdownButtonFormField<String>(
+                                decoration: const InputDecoration(
+                                  labelText: 'Select Field *',
+                                  border: OutlineInputBorder(),
+                                ),
+                                isExpanded: true, // Make sure the dropdown expands
+                                value: _selectedFieldName, // Use a plain variable for value
+                                items: items,
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select necessary fields';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  // Update the selected value
+                                  _selectedFieldName = value;
+                                  _fieldNameController.text = value ?? '';
+                                },
                               );
-                            }).toList() ?? [];
-
-                            return DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Select Field *',
-                                border: OutlineInputBorder(),
+                            },
+                          ),
+                        ),
+                      ),
+                      // Padding around the FloatingActionButton
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddFieldRecord(),
                               ),
-                              isExpanded: true, // Make sure the dropdown expands
-                              value: _selectedFieldName, // Use a plain variable for value
-                              items: items,
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please select necessary fields';
-                                }
-                                return null;
-                              },
-                              onChanged: (value) {
-                                // Update the selected value
-                                _selectedFieldName = value;
-                                _fieldNameController.text = value ?? '';
-                              },
                             );
                           },
+                          backgroundColor: Color(0xff727530),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+      
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<TreatmentSpecificToPlanting>(
+                    value: _selectedTreatmentSpecificToPlanting.value,
+                    decoration: InputDecoration(
+                      labelText: 'Treatment Specific to Planting *',
+                      border: OutlineInputBorder(),
                     ),
-                    // Padding around the FloatingActionButton
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddFieldRecord(),
+                    items: TreatmentSpecificToPlanting.values
+                        .map((option) => DropdownMenuItem<TreatmentSpecificToPlanting>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TreatmentSpecificToPlanting? newValue) {
+                      _selectedTreatmentSpecificToPlanting.value = newValue; // Update the notifier value
+                    },
+                  ),
+                  SizedBox(height: 30),
+                  // Using ValueListenableBuilder to listen for changes in _selectedTreatment
+                ValueListenableBuilder<TreatmentSpecificToPlanting?>(
+                  valueListenable: _selectedTreatmentSpecificToPlanting,
+                  builder: (context, value, child) {
+                    if (value == TreatmentSpecificToPlanting.Yes) {
+                      return StreamBuilder<QuerySnapshot>(
+                        stream: getAllPlantingsStream(), // Replace this with your actual Firestore stream
+                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (!snapshot.hasData) return Container(); // Or show a loading indicator
+      
+                          // Create a list of dropdown items
+                          List<DropdownMenuItem<String>> items = snapshot.data?.docs.map((DocumentSnapshot doc) {
+                            // TODO: EDIT krte waqt field retrive nh horhi dropdown men auto. due to inconsistent amount of data / fields.
+                            String combinedValue = "${doc.get('cropName')} | ${doc.get('varietyName')} | ${doc.get('plantingDate')}";
+                            return DropdownMenuItem<String>(
+                              value: combinedValue,
+                              child: Text(combinedValue),
+                            );
+                          }).toList() ?? [];
+      
+                          // Make sure the controller's value matches one of the items
+                          String? selectedValue = items.isNotEmpty && items.any((item) => item.value == _plantingNameController.text)
+                              ? _plantingNameController.text
+                              : null;
+      
+                          return DropdownButtonFormField<String>(
+                            value: selectedValue,
+                            decoration: const InputDecoration(
+                              labelText: 'Select Planting to Harvest *',
+                              border: OutlineInputBorder(),
                             ),
+                            isExpanded: true, // Allow dropdown to expand
+                            items: items,
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select necessary fields';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              _plantingNameController.text = value ?? '';
+                              if (value != null) {
+                                List<String> splitValue = value.split("|");
+                                cropName = splitValue[0].trim();
+                                cropVariety = splitValue[1].trim();
+                              }
+                            },
                           );
                         },
-                        backgroundColor: Color(0xff727530),
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 30),
-                DropdownButtonFormField<TreatmentSpecificToPlanting>(
-                  value: _selectedTreatmentSpecificToPlanting.value,
-                  decoration: InputDecoration(
-                    labelText: 'Treatment Specific to Planting *',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: TreatmentSpecificToPlanting.values
-                      .map((option) => DropdownMenuItem<TreatmentSpecificToPlanting>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
+                      );
+                    } else {
+                      return SizedBox.shrink(); // No field shown
                     }
-                    return null;
-                  },
-                  onChanged: (TreatmentSpecificToPlanting? newValue) {
-                    _selectedTreatmentSpecificToPlanting.value = newValue; // Update the notifier value
                   },
                 ),
                 SizedBox(height: 30),
-                // Using ValueListenableBuilder to listen for changes in _selectedTreatment
-              ValueListenableBuilder<TreatmentSpecificToPlanting?>(
-                valueListenable: _selectedTreatmentSpecificToPlanting,
-                builder: (context, value, child) {
-                  if (value == TreatmentSpecificToPlanting.Yes) {
-                    return StreamBuilder<QuerySnapshot>(
-                      stream: getAllPlantingsStream(), // Replace this with your actual Firestore stream
-                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (!snapshot.hasData) return Container(); // Or show a loading indicator
-
-                        // Create a list of dropdown items
-                        List<DropdownMenuItem<String>> items = snapshot.data?.docs.map((DocumentSnapshot doc) {
-                          // TODO: EDIT krte waqt field retrive nh horhi dropdown men auto. due to inconsistent amount of data / fields.
-                          String combinedValue = "${doc.get('cropName')} | ${doc.get('varietyName')} | ${doc.get('plantingDate')}";
-                          return DropdownMenuItem<String>(
-                            value: combinedValue,
-                            child: Text(combinedValue),
-                          );
-                        }).toList() ?? [];
-
-                        // Make sure the controller's value matches one of the items
-                        String? selectedValue = items.isNotEmpty && items.any((item) => item.value == _plantingNameController.text)
-                            ? _plantingNameController.text
-                            : null;
-
-                        return DropdownButtonFormField<String>(
-                          value: selectedValue,
-                          decoration: const InputDecoration(
-                            labelText: 'Select Planting to Harvest *',
-                            border: OutlineInputBorder(),
-                          ),
-                          isExpanded: true, // Allow dropdown to expand
-                          items: items,
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Please select necessary fields';
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            _plantingNameController.text = value ?? '';
-                            if (value != null) {
-                              List<String> splitValue = value.split("|");
-                              cropName = splitValue[0].trim();
-                              cropVariety = splitValue[1].trim();
-                            }
-                          },
-                        );
-                      },
-                    );
-                  } else {
-                    return SizedBox.shrink(); // No field shown
-                  }
-                },
+                  TextFormField(
+                    controller: _productUsedController,
+                    decoration: InputDecoration(
+                      labelText: 'Product used / to be used',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _quantityOfProductController,
+                    decoration: InputDecoration(
+                      labelText: 'Quantity of Product used / to be used',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: 'Notes (for your convenience)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 4,
+                  ),
+                ],
               ),
-              SizedBox(height: 30),
-                TextFormField(
-                  controller: _productUsedController,
-                  decoration: InputDecoration(
-                    labelText: 'Product used / to be used',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _quantityOfProductController,
-                  decoration: InputDecoration(
-                    labelText: 'Quantity of Product used / to be used',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: 'Notes (for your convenience)',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 4,
-                ),
-              ],
             ),
           ),
         ),

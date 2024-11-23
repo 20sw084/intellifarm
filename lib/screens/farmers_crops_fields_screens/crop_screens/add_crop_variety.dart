@@ -19,138 +19,139 @@ class AddCropVariety extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("New Crop Variety"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-              onPressed: () {
-                _saveForm(context);
-              },
-              icon: Icon(Icons.check_box)),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 30),
-                Container(
-                  height: 35,
-                  color: Color(0xff727530),
-                  child: Row(
-                    children: [
-                      SizedBox(width: 10),
-                      Icon(Icons.kayaking),
-                      SizedBox(width: 10),
-                      Text(cropName ?? "Crop Name not fetched"),
-                    ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("New Crop Variety"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _saveForm(context);
+                },
+                icon: Icon(Icons.check_box)),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 30),
+                  Container(
+                    height: 35,
+                    color: Color(0xff727530),
+                    child: Row(
+                      children: [
+                        SizedBox(width: 10),
+                        Icon(Icons.kayaking),
+                        SizedBox(width: 10),
+                        Text(cropName ?? "Crop Name not fetched"),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: varietyName,
-                  decoration: InputDecoration(
-                    labelText: 'Variety Name  *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: varietyName,
+                    decoration: InputDecoration(
+                      labelText: 'Variety Name  *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                DropdownButtonFormField<LightProfile>(
-                  decoration: InputDecoration(
-                    labelText: 'Select Light Profile *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<LightProfile>(
+                    decoration: InputDecoration(
+                      labelText: 'Select Light Profile *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: LightProfile.values
+                        .map((option) => DropdownMenuItem<LightProfile>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (LightProfile? newValue) {
+                      lightProfile = newValue;
+                      // Do something with the selected value
+                    },
                   ),
-                  items: LightProfile.values
-                      .map((option) => DropdownMenuItem<LightProfile>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (LightProfile? newValue) {
-                    lightProfile = newValue;
-                    // Do something with the selected value
-                  },
-                ),
-                SizedBox(height: 30),
-                DropdownButtonFormField<FieldType>(
-                  decoration: InputDecoration(
-                    labelText: 'Select Field Type *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<FieldType>(
+                    decoration: InputDecoration(
+                      labelText: 'Select Field Type *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: FieldType.values
+                        .map((option) => DropdownMenuItem<FieldType>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (FieldType? newValue) {
+                      fieldType = newValue;
+                      // Do something with the selected value
+                    },
                   ),
-                  items: FieldType.values
-                      .map((option) => DropdownMenuItem<FieldType>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (FieldType? newValue) {
-                    fieldType = newValue;
-                    // Do something with the selected value
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: daysToMaturity,
-                  decoration: InputDecoration(
-                    labelText: 'Days to Maturity  *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: daysToMaturity,
+                    decoration: InputDecoration(
+                      labelText: 'Days to Maturity  *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: harvestWindowDays,
-                  decoration: InputDecoration(
-                    labelText: 'Harvest Window (Days)  *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: harvestWindowDays,
+                    decoration: InputDecoration(
+                      labelText: 'Harvest Window (Days)  *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: notes,
-                  decoration: InputDecoration(
-                    labelText: 'Notes (for your convenience)',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: notes,
+                    decoration: InputDecoration(
+                      labelText: 'Notes (for your convenience)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 4,
                   ),
-                  maxLines: 4,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

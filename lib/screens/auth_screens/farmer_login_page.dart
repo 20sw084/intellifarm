@@ -14,83 +14,85 @@ class FarmerLoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Farmer Login Page'),
-      ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Spacer(),
-                const Text("Enter the unique 10-digits number provided by your owner!"),
-                const SizedBox(
-                  height: 13,
-                ),
-                TextFormField(
-                  controller: _uniqueNumber,
-                  decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xff727530), width: 2),
-                    ),
-                    prefixIcon: const Icon(
-                      Icons.phone_android_sharp,
-                      size: 30,
-                      color: Color(0xff727530),
-                    ),
-                    hintText: 'UNIQUE NUMBER',
-                    hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          title: const Text('Farmer Login Page'),
+        ),
+        body: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  const Text("Enter the unique 10-digits number provided by your owner!"),
+                  const SizedBox(
+                    height: 13,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Unique Number is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                const Spacer(),
-                Container(
-                  height: 50,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
-                    color: const Color(0xff727530),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff727530),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32.0),
+                  TextFormField(
+                    controller: _uniqueNumber,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: Color(0xff727530), width: 2),
                       ),
+                      prefixIcon: const Icon(
+                        Icons.phone_android_sharp,
+                        size: 30,
+                        color: Color(0xff727530),
+                      ),
+                      hintText: 'UNIQUE NUMBER',
+                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
-                    onPressed: () async {
-                      await _submitForm(context);
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Unique Number is required';
+                      }
+                      return null;
                     },
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'LOGIN',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  const Spacer(),
+                  Container(
+                    height: 50,
+                    width: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(32),
+                      color: const Color(0xff727530),
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff727530),
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32.0),
+                        ),
+                      ),
+                      onPressed: () async {
+                        await _submitForm(context);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'LOGIN',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

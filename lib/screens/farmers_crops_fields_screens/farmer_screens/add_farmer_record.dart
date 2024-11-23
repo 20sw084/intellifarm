@@ -22,90 +22,92 @@ class AddFarmerRecord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("New Farmer"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await _saveForm(context).whenComplete(() {
-                Provider.of<FarmerProvider>(context, listen: false).needsRefresh = true;
-              });
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              SizedBox(height: 30),
-              TextFormField(
-                controller: farmerNameController,
-                decoration: InputDecoration(
-                  labelText: 'Name of Farmer  *',
-                  border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("New Farmer"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await _saveForm(context).whenComplete(() {
+                  Provider.of<FarmerProvider>(context, listen: false).needsRefresh = true;
+                });
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: farmerNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name of Farmer  *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'This field is required';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'This field is required';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 30),
-              TextFormField(
-                controller: farmerPhoneController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number *',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: farmerPhoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'This field is required';
+                    } else if (!RegExp(r'^\d{11}$').hasMatch(value)) {
+                      return 'Please enter a valid 11-digit number';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'This field is required';
-                  } else if (!RegExp(r'^\d{11}$').hasMatch(value)) {
-                    return 'Please enter a valid 11-digit number';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 30),
-              DropdownButtonFormField<ShareRule>(
-                value: shareRuleController,
-                decoration: InputDecoration(
-                  labelText: 'Select Share Rule *',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 30),
+                DropdownButtonFormField<ShareRule>(
+                  value: shareRuleController,
+                  decoration: InputDecoration(
+                    labelText: 'Select Share Rule *',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ShareRule.values
+                      .map((option) => DropdownMenuItem<ShareRule>(
+                    value: option,
+                    child: Text(option.toString().split('.')[1]),
+                  ))
+                      .toList(),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select necessary fields';
+                    }
+                    return null;
+                  },
+                  onChanged: (ShareRule? newValue) {
+                    shareRuleController = newValue!;
+                  },
                 ),
-                items: ShareRule.values
-                    .map((option) => DropdownMenuItem<ShareRule>(
-                  value: option,
-                  child: Text(option.toString().split('.')[1]),
-                ))
-                    .toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select necessary fields';
-                  }
-                  return null;
-                },
-                onChanged: (ShareRule? newValue) {
-                  shareRuleController = newValue!;
-                },
-              ),
-              SizedBox(height: 30),
-              TextFormField(
-                controller: cnicController,
-                decoration: InputDecoration(
-                  labelText: 'C-NIC Number',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: cnicController,
+                  decoration: InputDecoration(
+                    labelText: 'C-NIC Number',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

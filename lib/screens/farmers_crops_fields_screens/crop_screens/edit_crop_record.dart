@@ -36,105 +36,107 @@ class EditCropRecord extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Crop"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _saveForm(context);
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              SizedBox(height: 30),
-              // TextFormField(
-              //   controller: _selectedCropNotifier,
-              //   decoration: InputDecoration(
-              //     labelText: 'Name of Crop *',
-              //     border: OutlineInputBorder(),
-              //   ),
-              //   validator: (value) {
-              //     if (value!.isEmpty) {
-              //       return 'This field is required';
-              //     }
-              //     return null;
-              //   },
-              // ),
-              ValueListenableBuilder<CropType>(
-                valueListenable: _selectedCropNotifier,
-                builder: (context, selectedCrop, child) {
-                  return DropdownButtonFormField<CropType>(
-                    value: selectedCrop,
-                    decoration: InputDecoration(
-                      labelText: 'Select Crop *',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: CropType.values
-                        .map((option) => DropdownMenuItem<CropType>(
-                      value: option,
-                      child: Text(option.toString().split('.')[1]),
-                    ))
-                        .toList(),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select necessary crops';
-                      }
-                      return null;
-                    },
-                    onChanged: (CropType? newValue) {
-                      _selectedCropNotifier.value = newValue!;
-                    },
-                  );
-                },
-              ),
-              SizedBox(height: 30),
-              ValueListenableBuilder<Units>(
-                valueListenable: _selectedUnitNotifier,
-                builder: (context, selectedUnit, child) {
-                  return DropdownButtonFormField<Units>(
-                    value: selectedUnit,
-                    decoration: InputDecoration(
-                      labelText: 'Select Harvest Unit *',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: Units.values
-                        .map((option) => DropdownMenuItem<Units>(
-                      value: option,
-                      child: Text(option.toString().split('.')[1]),
-                    ))
-                        .toList(),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select necessary fields';
-                      }
-                      return null;
-                    },
-                    onChanged: (Units? newValue) {
-                      _selectedUnitNotifier.value = newValue!;
-                    },
-                  );
-                },
-              ),
-              SizedBox(height: 30),
-              TextFormField(
-                controller: _notesController,
-                decoration: InputDecoration(
-                  labelText: 'Notes (for your convenience)',
-                  border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Edit Crop"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {
+                _saveForm(context);
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(height: 30),
+                // TextFormField(
+                //   controller: _selectedCropNotifier,
+                //   decoration: InputDecoration(
+                //     labelText: 'Name of Crop *',
+                //     border: OutlineInputBorder(),
+                //   ),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'This field is required';
+                //     }
+                //     return null;
+                //   },
+                // ),
+                ValueListenableBuilder<CropType>(
+                  valueListenable: _selectedCropNotifier,
+                  builder: (context, selectedCrop, child) {
+                    return DropdownButtonFormField<CropType>(
+                      value: selectedCrop,
+                      decoration: InputDecoration(
+                        labelText: 'Select Crop *',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: CropType.values
+                          .map((option) => DropdownMenuItem<CropType>(
+                        value: option,
+                        child: Text(option.toString().split('.')[1]),
+                      ))
+                          .toList(),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select necessary crops';
+                        }
+                        return null;
+                      },
+                      onChanged: (CropType? newValue) {
+                        _selectedCropNotifier.value = newValue!;
+                      },
+                    );
+                  },
                 ),
-                maxLines: 4,
-              ),
-            ],
+                SizedBox(height: 30),
+                ValueListenableBuilder<Units>(
+                  valueListenable: _selectedUnitNotifier,
+                  builder: (context, selectedUnit, child) {
+                    return DropdownButtonFormField<Units>(
+                      value: selectedUnit,
+                      decoration: InputDecoration(
+                        labelText: 'Select Harvest Unit *',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: Units.values
+                          .map((option) => DropdownMenuItem<Units>(
+                        value: option,
+                        child: Text(option.toString().split('.')[1]),
+                      ))
+                          .toList(),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select necessary fields';
+                        }
+                        return null;
+                      },
+                      onChanged: (Units? newValue) {
+                        _selectedUnitNotifier.value = newValue!;
+                      },
+                    );
+                  },
+                ),
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: _notesController,
+                  decoration: InputDecoration(
+                    labelText: 'Notes (for your convenience)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 4,
+                ),
+              ],
+            ),
           ),
         ),
       ),

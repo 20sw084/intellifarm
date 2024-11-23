@@ -15,25 +15,27 @@ class ViewReceipts extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3, // Number of tabs
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xff727530),
-          foregroundColor: Colors.white,
-          title: const Text('View Receipts'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Un-Approved'),
-              Tab(text: 'Rejected'),
-              Tab(text: 'Approved'),
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xff727530),
+            foregroundColor: Colors.white,
+            title: const Text('View Receipts'),
+            bottom: const TabBar(
+              tabs: [
+                Tab(text: 'Un-Approved'),
+                Tab(text: 'Rejected'),
+                Tab(text: 'Approved'),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              ReceiptUnApprovedList(plantingId: plantingId),
+              ReceiptRejectedList(plantingId: plantingId),
+              ReceiptApprovedList(plantingId: plantingId),
             ],
           ),
-        ),
-        body: TabBarView(
-          children: [
-            ReceiptUnApprovedList(plantingId: plantingId),
-            ReceiptRejectedList(plantingId: plantingId),
-            ReceiptApprovedList(plantingId: plantingId),
-          ],
         ),
       ),
     );

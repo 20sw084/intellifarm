@@ -18,84 +18,86 @@ class AddCropRecord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("New Crop"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await _saveForm(context);
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              SizedBox(height: 30),
-              DropdownButtonFormField<CropType>(
-                decoration: InputDecoration(
-                  labelText: 'Select Crop *',
-                  border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("New Crop"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await _saveForm(context);
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(height: 30),
+                DropdownButtonFormField<CropType>(
+                  decoration: InputDecoration(
+                    labelText: 'Select Crop *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'This field is required';
+                    }
+                    return null;
+                  },
+                  items: CropType.values
+                      .map((crop) => DropdownMenuItem(
+                    value: crop,
+                    child: Text(crop.name),
+                  ))
+                      .toList(),
+                  onChanged: (value) {
+                    // setState(() {
+                      _selectedCrop = value;
+                    // });
+                  },
+                  value: _selectedCrop,
                 ),
-                validator: (value) {
-                  if (value == null) {
-                    return 'This field is required';
-                  }
-                  return null;
-                },
-                items: CropType.values
-                    .map((crop) => DropdownMenuItem(
-                  value: crop,
-                  child: Text(crop.name),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  // setState(() {
-                    _selectedCrop = value;
-                  // });
-                },
-                value: _selectedCrop,
-              ),
-              SizedBox(height: 30),
-              DropdownButtonFormField<Units>(
-                value: harvestUnitController,
-                decoration: InputDecoration(
-                  labelText: 'Select Harvest Unit *',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 30),
+                DropdownButtonFormField<Units>(
+                  value: harvestUnitController,
+                  decoration: InputDecoration(
+                    labelText: 'Select Harvest Unit *',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: Units.values
+                      .map((option) => DropdownMenuItem<Units>(
+                    value: option,
+                    child: Text(option.toString().split('.')[1]),
+                  ))
+                      .toList(),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select necessary fields';
+                    }
+                    return null;
+                  },
+                  onChanged: (Units? newValue) {
+                    harvestUnitController = newValue!;
+                  },
                 ),
-                items: Units.values
-                    .map((option) => DropdownMenuItem<Units>(
-                  value: option,
-                  child: Text(option.toString().split('.')[1]),
-                ))
-                    .toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select necessary fields';
-                  }
-                  return null;
-                },
-                onChanged: (Units? newValue) {
-                  harvestUnitController = newValue!;
-                },
-              ),
-              SizedBox(height: 30),
-              TextFormField(
-                controller: notesController,
-                decoration: InputDecoration(
-                  labelText: 'Notes (for your convenience)',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: notesController,
+                  decoration: InputDecoration(
+                    labelText: 'Notes (for your convenience)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 4,
                 ),
-                maxLines: 4,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

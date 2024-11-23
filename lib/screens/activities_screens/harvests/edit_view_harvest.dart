@@ -57,155 +57,157 @@ class EditViewActivityHarvest extends StatelessWidget {
     cropVariety = harvest.plantingToHarvest!.split("|")[2].trim();
 
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit/View Harvest"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _saveForm(context);
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _harvestDateController,
-                  onTap: () => _selectDate(context),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Harvest Date *',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                StreamBuilder<QuerySnapshot>(
-                  stream: getAllPlantingsStream(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) return Container();
-                    return DropdownButtonFormField(
-                      value: _plantingNameController.text.isEmpty ? null : _plantingNameController.text,
-                      decoration: const InputDecoration(
-                        labelText: 'Select Planting to Harvest *',
-                        border: OutlineInputBorder(),
-                      ),
-                      isExpanded: false,
-                      items: snapshot.data?.docs.map((DocumentSnapshot value) {
-                        return DropdownMenuItem(
-                          value: "${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('fieldName')}",
-                          child: Text("${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('fieldName')}"),
-                        );
-                      }).toList(),
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please select necessary fields';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        selectedPlanting = value as String;
-                        _plantingNameController.text = selectedPlanting!;
-                        cropName = value.toString().split("|")[0].trim();
-                        fieldName = value.toString().split("|")[1].trim();
-                        cropVariety = value.toString().split("|")[2].trim();
-                      },
-                    );
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _quantityHarvestedController,
-                  decoration: InputDecoration(
-                    labelText: 'Quantity Harvested (Bushels)  *',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _batchNumberController,
-                  decoration: InputDecoration(
-                    labelText: 'Batch Number (Optional)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _harvestQualityController,
-                  decoration: InputDecoration(
-                    labelText: 'Harvest Quality (e.g A, B, etc)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 30),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("Is this a final harvest for the planting?"),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Edit/View Harvest"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {
+                _saveForm(context);
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _harvestDateController,
+                    onTap: () => _selectDate(context),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Harvest Date *',
+                      border: OutlineInputBorder(),
                     ),
-                    YesNoRadioButton(controller: yesNoController),
-                  ],
-                ),
-                SizedBox(height: 30),
-                Text("Harvest Income (Optional, can be filled later after selling the harvest)."),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _quantityRejectedController,
-                  decoration: InputDecoration(
-                    labelText: 'Quantity Rejected (Bushels)',
-                    border: OutlineInputBorder(),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _unitCostController,
-                  decoration: InputDecoration(
-                    labelText: 'Unit Cost',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: getAllPlantingsStream(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (!snapshot.hasData) return Container();
+                      return DropdownButtonFormField(
+                        value: _plantingNameController.text.isEmpty ? null : _plantingNameController.text,
+                        decoration: const InputDecoration(
+                          labelText: 'Select Planting to Harvest *',
+                          border: OutlineInputBorder(),
+                        ),
+                        isExpanded: false,
+                        items: snapshot.data?.docs.map((DocumentSnapshot value) {
+                          return DropdownMenuItem(
+                            value: "${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('fieldName')}",
+                            child: Text("${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('fieldName')}"),
+                          );
+                        }).toList(),
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select necessary fields';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          selectedPlanting = value as String;
+                          _plantingNameController.text = selectedPlanting!;
+                          cropName = value.toString().split("|")[0].trim();
+                          fieldName = value.toString().split("|")[1].trim();
+                          cropVariety = value.toString().split("|")[2].trim();
+                        },
+                      );
+                    },
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _incomeController,
-                  decoration: InputDecoration(
-                    labelText: 'Income from this Harvest',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _quantityHarvestedController,
+                    decoration: InputDecoration(
+                      labelText: 'Quantity Harvested (Bushels)  *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: 'Notes (for your convenience)',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _batchNumberController,
+                    decoration: InputDecoration(
+                      labelText: 'Batch Number (Optional)',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  maxLines: 4,
-                ),
-              ],
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _harvestQualityController,
+                    decoration: InputDecoration(
+                      labelText: 'Harvest Quality (e.g A, B, etc)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Is this a final harvest for the planting?"),
+                      ),
+                      YesNoRadioButton(controller: yesNoController),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Text("Harvest Income (Optional, can be filled later after selling the harvest)."),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _quantityRejectedController,
+                    decoration: InputDecoration(
+                      labelText: 'Quantity Rejected (Bushels)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _unitCostController,
+                    decoration: InputDecoration(
+                      labelText: 'Unit Cost',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _incomeController,
+                    decoration: InputDecoration(
+                      labelText: 'Income from this Harvest',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: 'Notes (for your convenience)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 4,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

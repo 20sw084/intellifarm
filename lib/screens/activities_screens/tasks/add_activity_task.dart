@@ -43,173 +43,128 @@ class AddActivityTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("New Task"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _saveForm(context);
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _taskDateController,
-                  onTap: () => _selectDate(context),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Task Date *',
-                    border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("New Task"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {
+                _saveForm(context);
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _taskDateController,
+                    onTap: () => _selectDate(context),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Task Date *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 15),
-                Text("Status (Auto-filled, depends on date selected)"),
-                SizedBox(height: 15),
-                DropdownButtonFormField<TaskStatus>(
-                  value: _selectedTaskStatus.value,
-                  decoration: InputDecoration(
-                    labelText: 'Select Status of Task *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 15),
+                  Text("Status (Auto-filled, depends on date selected)"),
+                  SizedBox(height: 15),
+                  DropdownButtonFormField<TaskStatus>(
+                    value: _selectedTaskStatus.value,
+                    decoration: InputDecoration(
+                      labelText: 'Select Status of Task *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: TaskStatus.values
+                        .map((option) => DropdownMenuItem<TaskStatus>(
+                              value: option,
+                              child: Text(option.toString().split('.')[1]),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TaskStatus? newValue) {
+                      _selectedTaskStatus.value = newValue;
+                    },
                   ),
-                  items: TaskStatus.values
-                      .map((option) => DropdownMenuItem<TaskStatus>(
-                            value: option,
-                            child: Text(option.toString().split('.')[1]),
-                          ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (TaskStatus? newValue) {
-                    _selectedTaskStatus.value = newValue;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _taskNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Task name *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _taskNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Task name *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                DropdownButtonFormField<TaskSpecificToPlanting>(
-                  value: _selectedTaskSpecificToPlanting.value,
-                  decoration: InputDecoration(
-                    labelText: 'Task Specific to Planting *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<TaskSpecificToPlanting>(
+                    value: _selectedTaskSpecificToPlanting.value,
+                    decoration: InputDecoration(
+                      labelText: 'Task Specific to Planting *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: TaskSpecificToPlanting.values
+                        .map((option) => DropdownMenuItem<TaskSpecificToPlanting>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TaskSpecificToPlanting? newValue) {
+                      _selectedTaskSpecificToPlanting.value = newValue; // Update the notifier value
+                    },
                   ),
-                  items: TaskSpecificToPlanting.values
-                      .map((option) => DropdownMenuItem<TaskSpecificToPlanting>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (TaskSpecificToPlanting? newValue) {
-                    _selectedTaskSpecificToPlanting.value = newValue; // Update the notifier value
-                  },
-                ),
-                SizedBox(height: 30),
-                ValueListenableBuilder<TaskSpecificToPlanting?>(
-                  valueListenable: _selectedTaskSpecificToPlanting,
-                  builder: (context, value, child) {
-                    if (value == TaskSpecificToPlanting.Yes) {
-                      return StreamBuilder<QuerySnapshot>(
-                        stream: getAllPlantingsStream(), // Replace this with your actual Firestore stream
-                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (!snapshot.hasData) return Container(); // Or show a loading indicator
-                          return DropdownButtonFormField(
-                            value: _plantingNameController.text.isEmpty ? null : _plantingNameController.text,
-                            decoration: const InputDecoration(
-                              labelText: 'Select Planting to Harvest *',
-                              border: OutlineInputBorder(),
-                            ),
-                            isExpanded: false,
-                            items: snapshot.data?.docs.map((DocumentSnapshot value) {
-                              return DropdownMenuItem(
-                                value: "${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}",
-                                child: Text("${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}"),
-                              );
-                            }).toList(),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select necessary fields';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              _plantingNameController.text = value.toString();
-                              // String selectedPlanting = value as String;
-                              cropName = value?.split("|")[0].trim();
-                              cropVariety = value?.split("|")[2].trim();
-                            },
-                          );
-                        },
-                      );
-                    } else {
-                      return SizedBox.shrink(); // No field shown
-                    }
-                  },
-                ),
-                SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: getFieldDataViaStream(),
+                  SizedBox(height: 30),
+                  ValueListenableBuilder<TaskSpecificToPlanting?>(
+                    valueListenable: _selectedTaskSpecificToPlanting,
+                    builder: (context, value, child) {
+                      if (value == TaskSpecificToPlanting.Yes) {
+                        return StreamBuilder<QuerySnapshot>(
+                          stream: getAllPlantingsStream(), // Replace this with your actual Firestore stream
                           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (!snapshot.hasData) return Container();
-
-                            // Define a list of dropdown items
-                            List<DropdownMenuItem<String>> items = snapshot.data?.docs.map((value) {
-                              return DropdownMenuItem<String>(
-                                value: value.get('name'),
-                                child: Text('${value.get('name')}'),
-                              );
-                            }).toList() ?? [];
-
-                            return DropdownButtonFormField<String>(
+                            if (!snapshot.hasData) return Container(); // Or show a loading indicator
+                            return DropdownButtonFormField(
+                              value: _plantingNameController.text.isEmpty ? null : _plantingNameController.text,
                               decoration: const InputDecoration(
-                                labelText: 'Select Field *',
+                                labelText: 'Select Planting to Harvest *',
                                 border: OutlineInputBorder(),
                               ),
-                              isExpanded: true, // Make sure the dropdown expands
-                              value: _selectedFieldName, // Use a plain variable for value
-                              items: items,
+                              isExpanded: false,
+                              items: snapshot.data?.docs.map((DocumentSnapshot value) {
+                                return DropdownMenuItem(
+                                  value: "${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}",
+                                  child: Text("${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}"),
+                                );
+                              }).toList(),
                               validator: (value) {
                                 if (value == null) {
                                   return 'Please select necessary fields';
@@ -217,46 +172,93 @@ class AddActivityTask extends StatelessWidget {
                                 return null;
                               },
                               onChanged: (value) {
-                                // Update the selected value
-                                _selectedFieldName = value;
-                                _fieldNameController.text = value ?? '';
+                                _plantingNameController.text = value.toString();
+                                // String selectedPlanting = value as String;
+                                cropName = value?.split("|")[0].trim();
+                                cropVariety = value?.split("|")[2].trim();
                               },
                             );
                           },
-                        ),
-                      ),
-                    ),
-                    // Padding around the FloatingActionButton
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddFieldRecord(),
-                            ),
-                          );
-                        },
-                        backgroundColor: Color(0xff727530),
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: 'Notes (for your convenience)',
-                    border: OutlineInputBorder(),
+                        );
+                      } else {
+                        return SizedBox.shrink(); // No field shown
+                      }
+                    },
                   ),
-                  maxLines: 4,
-                ),
-              ],
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: getFieldDataViaStream(),
+                            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (!snapshot.hasData) return Container();
+      
+                              // Define a list of dropdown items
+                              List<DropdownMenuItem<String>> items = snapshot.data?.docs.map((value) {
+                                return DropdownMenuItem<String>(
+                                  value: value.get('name'),
+                                  child: Text('${value.get('name')}'),
+                                );
+                              }).toList() ?? [];
+      
+                              return DropdownButtonFormField<String>(
+                                decoration: const InputDecoration(
+                                  labelText: 'Select Field *',
+                                  border: OutlineInputBorder(),
+                                ),
+                                isExpanded: true, // Make sure the dropdown expands
+                                value: _selectedFieldName, // Use a plain variable for value
+                                items: items,
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select necessary fields';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  // Update the selected value
+                                  _selectedFieldName = value;
+                                  _fieldNameController.text = value ?? '';
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      // Padding around the FloatingActionButton
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddFieldRecord(),
+                              ),
+                            );
+                          },
+                          backgroundColor: Color(0xff727530),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: 'Notes (for your convenience)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 4,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

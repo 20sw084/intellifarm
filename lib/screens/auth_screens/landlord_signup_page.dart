@@ -52,9 +52,9 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xff727530),
         appBar: AppBar(
           elevation: 0,
+          backgroundColor: Color(0xff727530),
           foregroundColor: Colors.white,
           title: const Text('Landlord Sign-Up Page'),
         ),

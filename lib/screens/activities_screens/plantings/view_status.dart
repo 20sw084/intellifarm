@@ -12,63 +12,65 @@ class ViewStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        title: const Text('View Status\''),
-      ),
-      body: FutureBuilder<List<QueryDocumentSnapshot>>(
-        future: getAllStatusForSpecificPlanting(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show loading indicator while data is being fetched
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            // Handle errors during data fetching
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            // Handle case when no data is returned
-            return const Center(child: Text('No status\' found.'));
-          } else {
-            // Data successfully fetched, build the list
-            final status = snapshot.data!;
-
-            return ListView.builder(
-              itemCount: status.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: ListTile(
-                    leading: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ViewImageScreen(
-                                imageFile: status[index]['statusLink'],
-                                type: 'Status', // Pass the type variable
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          title: const Text('View Status\''),
+        ),
+        body: FutureBuilder<List<QueryDocumentSnapshot>>(
+          future: getAllStatusForSpecificPlanting(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Show loading indicator while data is being fetched
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              // Handle errors during data fetching
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              // Handle case when no data is returned
+              return const Center(child: Text('No status\' found.'));
+            } else {
+              // Data successfully fetched, build the list
+              final status = snapshot.data!;
+      
+              return ListView.builder(
+                itemCount: status.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                      leading: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ViewImageScreen(
+                                  imageFile: status[index]['statusLink'],
+                                  type: 'Status', // Pass the type variable
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        child: Image.network(
-                          status[index]['statusLink'],
-                          fit: BoxFit.cover,
-                          // width: 50,
-                          // height: 50,
+                            );
+                          },
+                          child: Image.network(
+                            status[index]['statusLink'],
+                            fit: BoxFit.cover,
+                            // width: 50,
+                            // height: 50,
+                          ),
                         ),
                       ),
+                      title: Text('Status # ${status[index].id}'),
                     ),
-                    title: Text('Status # ${status[index].id}'),
-                  ),
-                );
-              },
-            );
-          }
-        },
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }

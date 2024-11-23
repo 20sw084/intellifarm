@@ -68,392 +68,394 @@ class EditPlanting extends StatelessWidget {
     _seedOriginController.text = cropPlanting.seedOrigin!;
     _notesController.text = cropPlanting.notes!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Planting"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              _saveForm(context);
-            },
-            icon: Icon(Icons.check_box),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _plantingDateController,
-                  onTap: () => _selectPlantingDate(context),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Planting Date *',
-                    border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Edit Planting"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {
+                _saveForm(context);
+              },
+              icon: Icon(Icons.check_box),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _plantingDateController,
+                    onTap: () => _selectPlantingDate(context),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Planting Date *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                DropdownButtonFormField<PlantingType>(
-                  value: _plantingTypeController,
-                  decoration: InputDecoration(
-                    labelText: 'Select Planting Type *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  DropdownButtonFormField<PlantingType>(
+                    value: _plantingTypeController,
+                    decoration: InputDecoration(
+                      labelText: 'Select Planting Type *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: PlantingType.values
+                        .map((option) => DropdownMenuItem<PlantingType>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (PlantingType? newValue) {
+                      // Do something with the selected value
+                      _plantingTypeController = newValue;
+                    },
                   ),
-                  items: PlantingType.values
-                      .map((option) => DropdownMenuItem<PlantingType>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (PlantingType? newValue) {
-                    // Do something with the selected value
-                    _plantingTypeController = newValue;
-                  },
-                ),
-                SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: TextFormField(
-                          initialValue: cropPlanting.cropName,
-                          decoration: InputDecoration(
-                            labelText: 'Crop Name',
-                            border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: TextFormField(
+                            initialValue: cropPlanting.cropName,
+                            decoration: InputDecoration(
+                              labelText: 'Crop Name',
+                              border: OutlineInputBorder(),
+                            ),
+                            readOnly: true,
                           ),
-                          readOnly: true,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: TextFormField(
-                          initialValue: cropPlanting.varietyName,
-                          decoration: InputDecoration(
-                            labelText: 'Crop Variety',
-                            border: OutlineInputBorder(),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: TextFormField(
+                            initialValue: cropPlanting.varietyName,
+                            decoration: InputDecoration(
+                              labelText: 'Crop Variety',
+                              border: OutlineInputBorder(),
+                            ),
+                            readOnly: true,
                           ),
-                          readOnly: true,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: TextFormField(
-                          initialValue: cropPlanting.fieldName,
-                          decoration: InputDecoration(
-                            labelText: 'Field Name',
-                            border: OutlineInputBorder(),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: TextFormField(
+                            initialValue: cropPlanting.fieldName,
+                            decoration: InputDecoration(
+                              labelText: 'Field Name',
+                              border: OutlineInputBorder(),
+                            ),
+                            readOnly: true,
                           ),
-                          readOnly: true,
                         ),
                       ),
+                    ],
+                  ),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: Center(
+                  //         child: StreamBuilder<QuerySnapshot>(
+                  //           stream: getCropDataViaStream(),
+                  //           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  //             if (!snapshot.hasData) return Container();
+                  //
+                  //             // Extract the list of crop names
+                  //             List<DropdownMenuItem<String>> cropItems = snapshot.data!.docs.map((value) {
+                  //               return DropdownMenuItem<String>(
+                  //                 value: value.get('name'),
+                  //                 child: Text(value.get('name')),
+                  //               );
+                  //             }).toList();
+                  //
+                  //             // Ensure _cropNameController.text is in the cropItems list
+                  //             if (_cropNameController.text.isNotEmpty && !cropItems.any((item) => item.value == _cropNameController.text)) {
+                  //               _cropNameController.text = '';
+                  //             }
+                  //
+                  //             return DropdownButtonFormField<String>(
+                  //               decoration: const InputDecoration(
+                  //                 labelText: 'Select Crop *',
+                  //                 border: OutlineInputBorder(),
+                  //               ),
+                  //               value: _cropNameController.text.isEmpty ? null : _cropNameController.text,
+                  //               items: cropItems,
+                  //               validator: (value) {
+                  //                 if (value == null || value.isEmpty) {
+                  //                   return 'Please select necessary fields';
+                  //                 }
+                  //                 return null;
+                  //               },
+                  //               onChanged: (value) {
+                  //                 _cropNameController.text = value!;
+                  //               },
+                  //             );
+                  //           },
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.only(
+                  //         right: 8.0,
+                  //         left: 8.0,
+                  //       ),
+                  //       child: FloatingActionButton(
+                  //         onPressed: () {
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) => AddCropRecord(),
+                  //             ),
+                  //           );
+                  //         },
+                  //         backgroundColor: Colors.greenAccent,
+                  //         child: const Icon(
+                  //           Icons.add,
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // SizedBox(height: 30),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: Center(
+                  //         child: StreamBuilder<QuerySnapshot>(
+                  //           stream: getCropVarietyDataViaStream(),
+                  //           builder: (BuildContext context,
+                  //               AsyncSnapshot<QuerySnapshot> snapshot) {
+                  //             if (!snapshot.hasData) return Container();
+                  //             return DropdownButtonFormField(
+                  //               decoration: const InputDecoration(
+                  //                 labelText: 'Select Crop Variety *',
+                  //                 border: OutlineInputBorder(),
+                  //               ),
+                  //               isExpanded: false,
+                  //               value: _cropVariety,
+                  //               items: snapshot.data?.docs.map((value) {
+                  //                 return DropdownMenuItem(
+                  //                   value: value.get('varietyName'),
+                  //                   child: Text('${value.get('varietyName')}'),
+                  //                 );
+                  //               }).toList(),
+                  //               validator: (value) {
+                  //                 if (value == null) {
+                  //                   return 'Please select necessary fields';
+                  //                 }
+                  //                 return null;
+                  //               },
+                  //               onChanged: (value) {
+                  //                 _cropVariety = value.toString();
+                  //               },
+                  //             );
+                  //           },
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.only(
+                  //         right: 8.0,
+                  //         left: 8.0,
+                  //       ),
+                  //       child: FloatingActionButton(
+                  //         onPressed: () {
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) => AddCropVariety(cropName: cropPlanting.cropName!,),
+                  //             ),
+                  //           );
+                  //         },
+                  //         child: Icon(
+                  //           Icons.add,
+                  //           color: Colors.white,
+                  //         ),
+                  //         backgroundColor: Colors.greenAccent,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // SizedBox(height: 30),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: Center(
+                  //         child: StreamBuilder<QuerySnapshot>(
+                  //           stream: getFieldDataViaStream(),
+                  //           builder: (BuildContext context,
+                  //               AsyncSnapshot<QuerySnapshot> snapshot) {
+                  //             if (!snapshot.hasData) return Container();
+                  //             return DropdownButtonFormField(
+                  //               decoration: const InputDecoration(
+                  //                 labelText: 'Select Field *',
+                  //                 border: OutlineInputBorder(),
+                  //               ),
+                  //               isExpanded: false,
+                  //               value: _fieldNameController,
+                  //               items: snapshot.data?.docs.map((value) {
+                  //                 return DropdownMenuItem(
+                  //                   value: value.get('name'),
+                  //                   child: Text('${value.get('name')}'),
+                  //                 );
+                  //               }).toList(),
+                  //               validator: (value) {
+                  //                 if (value == null) {
+                  //                   return 'Please select necessary fields';
+                  //                 }
+                  //                 return null;
+                  //               },
+                  //               onChanged: (value) {
+                  //                 _fieldNameController = value.toString();
+                  //               },
+                  //             );
+                  //           },
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     Padding(
+                  //       padding: const EdgeInsets.only(
+                  //         right: 8.0,
+                  //         left: 8.0,
+                  //       ),
+                  //       child: FloatingActionButton(
+                  //         onPressed: () {
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (context) => AddFieldRecord(),
+                  //             ),
+                  //           );
+                  //         },
+                  //         backgroundColor: Colors.greenAccent,
+                  //         child: const Icon(
+                  //           Icons.add,
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _harvestingDateController,
+                    onTap: () => _selectHarvestingDate(context),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'First Harvesting Date *',
+                      border: OutlineInputBorder(),
                     ),
-                  ],
-                ),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Center(
-                //         child: StreamBuilder<QuerySnapshot>(
-                //           stream: getCropDataViaStream(),
-                //           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                //             if (!snapshot.hasData) return Container();
-                //
-                //             // Extract the list of crop names
-                //             List<DropdownMenuItem<String>> cropItems = snapshot.data!.docs.map((value) {
-                //               return DropdownMenuItem<String>(
-                //                 value: value.get('name'),
-                //                 child: Text(value.get('name')),
-                //               );
-                //             }).toList();
-                //
-                //             // Ensure _cropNameController.text is in the cropItems list
-                //             if (_cropNameController.text.isNotEmpty && !cropItems.any((item) => item.value == _cropNameController.text)) {
-                //               _cropNameController.text = '';
-                //             }
-                //
-                //             return DropdownButtonFormField<String>(
-                //               decoration: const InputDecoration(
-                //                 labelText: 'Select Crop *',
-                //                 border: OutlineInputBorder(),
-                //               ),
-                //               value: _cropNameController.text.isEmpty ? null : _cropNameController.text,
-                //               items: cropItems,
-                //               validator: (value) {
-                //                 if (value == null || value.isEmpty) {
-                //                   return 'Please select necessary fields';
-                //                 }
-                //                 return null;
-                //               },
-                //               onChanged: (value) {
-                //                 _cropNameController.text = value!;
-                //               },
-                //             );
-                //           },
-                //         ),
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding: const EdgeInsets.only(
-                //         right: 8.0,
-                //         left: 8.0,
-                //       ),
-                //       child: FloatingActionButton(
-                //         onPressed: () {
-                //           Navigator.push(
-                //             context,
-                //             MaterialPageRoute(
-                //               builder: (context) => AddCropRecord(),
-                //             ),
-                //           );
-                //         },
-                //         backgroundColor: Colors.greenAccent,
-                //         child: const Icon(
-                //           Icons.add,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // SizedBox(height: 30),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Center(
-                //         child: StreamBuilder<QuerySnapshot>(
-                //           stream: getCropVarietyDataViaStream(),
-                //           builder: (BuildContext context,
-                //               AsyncSnapshot<QuerySnapshot> snapshot) {
-                //             if (!snapshot.hasData) return Container();
-                //             return DropdownButtonFormField(
-                //               decoration: const InputDecoration(
-                //                 labelText: 'Select Crop Variety *',
-                //                 border: OutlineInputBorder(),
-                //               ),
-                //               isExpanded: false,
-                //               value: _cropVariety,
-                //               items: snapshot.data?.docs.map((value) {
-                //                 return DropdownMenuItem(
-                //                   value: value.get('varietyName'),
-                //                   child: Text('${value.get('varietyName')}'),
-                //                 );
-                //               }).toList(),
-                //               validator: (value) {
-                //                 if (value == null) {
-                //                   return 'Please select necessary fields';
-                //                 }
-                //                 return null;
-                //               },
-                //               onChanged: (value) {
-                //                 _cropVariety = value.toString();
-                //               },
-                //             );
-                //           },
-                //         ),
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding: const EdgeInsets.only(
-                //         right: 8.0,
-                //         left: 8.0,
-                //       ),
-                //       child: FloatingActionButton(
-                //         onPressed: () {
-                //           Navigator.push(
-                //             context,
-                //             MaterialPageRoute(
-                //               builder: (context) => AddCropVariety(cropName: cropPlanting.cropName!,),
-                //             ),
-                //           );
-                //         },
-                //         child: Icon(
-                //           Icons.add,
-                //           color: Colors.white,
-                //         ),
-                //         backgroundColor: Colors.greenAccent,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // SizedBox(height: 30),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Center(
-                //         child: StreamBuilder<QuerySnapshot>(
-                //           stream: getFieldDataViaStream(),
-                //           builder: (BuildContext context,
-                //               AsyncSnapshot<QuerySnapshot> snapshot) {
-                //             if (!snapshot.hasData) return Container();
-                //             return DropdownButtonFormField(
-                //               decoration: const InputDecoration(
-                //                 labelText: 'Select Field *',
-                //                 border: OutlineInputBorder(),
-                //               ),
-                //               isExpanded: false,
-                //               value: _fieldNameController,
-                //               items: snapshot.data?.docs.map((value) {
-                //                 return DropdownMenuItem(
-                //                   value: value.get('name'),
-                //                   child: Text('${value.get('name')}'),
-                //                 );
-                //               }).toList(),
-                //               validator: (value) {
-                //                 if (value == null) {
-                //                   return 'Please select necessary fields';
-                //                 }
-                //                 return null;
-                //               },
-                //               onChanged: (value) {
-                //                 _fieldNameController = value.toString();
-                //               },
-                //             );
-                //           },
-                //         ),
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding: const EdgeInsets.only(
-                //         right: 8.0,
-                //         left: 8.0,
-                //       ),
-                //       child: FloatingActionButton(
-                //         onPressed: () {
-                //           Navigator.push(
-                //             context,
-                //             MaterialPageRoute(
-                //               builder: (context) => AddFieldRecord(),
-                //             ),
-                //           );
-                //         },
-                //         backgroundColor: Colors.greenAccent,
-                //         child: const Icon(
-                //           Icons.add,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _harvestingDateController,
-                  onTap: () => _selectHarvestingDate(context),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'First Harvesting Date *',
-                    border: OutlineInputBorder(),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _quantityPlantedController,
-                  decoration: InputDecoration(
-                    labelText: 'Quantity Planted  *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _quantityPlantedController,
+                    decoration: InputDecoration(
+                      labelText: 'Quantity Planted  *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _estimatedYieldController,
-                  decoration: InputDecoration(
-                    labelText: 'Estimated Yield',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _estimatedYieldController,
+                    decoration: InputDecoration(
+                      labelText: 'Estimated Yield',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _distanceBetweenPlantsController,
-                  decoration: InputDecoration(
-                    labelText: 'Distance between Plants.',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _distanceBetweenPlantsController,
+                    decoration: InputDecoration(
+                      labelText: 'Distance between Plants.',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _seedCompanyController,
-                  decoration: InputDecoration(
-                    labelText: 'Seed Company.',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _seedCompanyController,
+                    decoration: InputDecoration(
+                      labelText: 'Seed Company.',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _seedTypeController,
-                  decoration: InputDecoration(
-                    labelText: 'Seed Type.',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _seedTypeController,
+                    decoration: InputDecoration(
+                      labelText: 'Seed Type.',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _seedLotNumberController,
-                  decoration: InputDecoration(
-                    labelText: 'Seed Lot Number.',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _seedLotNumberController,
+                    decoration: InputDecoration(
+                      labelText: 'Seed Lot Number.',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _seedOriginController,
-                  decoration: InputDecoration(
-                    labelText: 'Seed Origin.',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _seedOriginController,
+                    decoration: InputDecoration(
+                      labelText: 'Seed Origin.',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: 'Notes (for your convenience)',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: 'Notes (for your convenience)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 4,
                   ),
-                  maxLines: 4,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

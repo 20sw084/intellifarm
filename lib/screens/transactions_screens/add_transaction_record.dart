@@ -52,204 +52,316 @@ class AddTransactionRecord extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("New $type"),
-        backgroundColor: Color(0xff727530),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-              onPressed: () {
-                _saveForm(context);
-              },
-              icon: Icon(Icons.check_box)),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                SizedBox(height: 15),
-                DropdownButtonFormField<TransactionSpecificToField>(
-                  value: _selectedTransactionSpecificToField.value,
-                  decoration: InputDecoration(
-                    labelText: 'Transaction Specific To a Field? *',
-                    border: OutlineInputBorder(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("New $type"),
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _saveForm(context);
+                },
+                icon: Icon(Icons.check_box)),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 15),
+                  DropdownButtonFormField<TransactionSpecificToField>(
+                    value: _selectedTransactionSpecificToField.value,
+                    decoration: InputDecoration(
+                      labelText: 'Transaction Specific To a Field? *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: TransactionSpecificToField.values
+                        .map((option) => DropdownMenuItem<TransactionSpecificToField>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TransactionSpecificToField? newValue) {
+                      _selectedTransactionSpecificToField.value = newValue; // Update the notifier value
+                    },
                   ),
-                  items: TransactionSpecificToField.values
-                      .map((option) => DropdownMenuItem<TransactionSpecificToField>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (TransactionSpecificToField? newValue) {
-                    _selectedTransactionSpecificToField.value = newValue; // Update the notifier value
-                  },
-                ),
-                SizedBox(height: 15),
-                ValueListenableBuilder<TransactionSpecificToField?>(
-                  valueListenable: _selectedTransactionSpecificToField,
-                  builder: (context, value, child) {
-                    if (value == TransactionSpecificToField.Yes) {
-                      return StreamBuilder<QuerySnapshot>(
-                        stream: getFieldDataViaStream(), // Replace this with your actual Firestore stream
-                        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (!snapshot.hasData) return Container(); // Or show a loading indicator
-                          return DropdownButtonFormField(
-                            decoration: const InputDecoration(
-                              labelText: 'Select Field *',
+                  SizedBox(height: 15),
+                  ValueListenableBuilder<TransactionSpecificToField?>(
+                    valueListenable: _selectedTransactionSpecificToField,
+                    builder: (context, value, child) {
+                      if (value == TransactionSpecificToField.Yes) {
+                        return StreamBuilder<QuerySnapshot>(
+                          stream: getFieldDataViaStream(), // Replace this with your actual Firestore stream
+                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (!snapshot.hasData) return Container(); // Or show a loading indicator
+                            return DropdownButtonFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'Select Field *',
+                                border: OutlineInputBorder(),
+                              ),
+                              isExpanded: false,
+                              items: snapshot.data?.docs.map((value) {
+                                return DropdownMenuItem(
+                                  value: value.get('name'),
+                                  child: Text('${value.get('name')}'),
+                                );
+                              }).toList(),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select necessary fields';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                // Handle value change for field selection
+                                _fieldSelected.value = value != null;
+                                _selectedFieldName = value.toString();
+                              },
+                            );
+                          },
+                        );
+                      } else {
+                        return SizedBox.shrink(); // No field shown
+                      }
+                    },
+                  ),
+                  SizedBox(height: 15),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _fieldSelected,
+                    builder: (context, fieldSelected, child) {
+                      if (fieldSelected) {
+                        return Column(
+                          children: [
+                            // Transaction Specific to Planting dropdown
+                            DropdownButtonFormField<TransactionSpecificToPlanting>(
+                              value: _selectedTransactionSpecificToPlanting.value,
+                              decoration: InputDecoration(
+                                labelText: 'Transaction Specific to Planting *',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: TransactionSpecificToPlanting.values
+                                  .map((option) => DropdownMenuItem<TransactionSpecificToPlanting>(
+                                value: option,
+                                child: Text(option.toString().split('.')[1]),
+                              ))
+                                  .toList(),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please select necessary fields';
+                                }
+                                return null;
+                              },
+                              onChanged: (TransactionSpecificToPlanting? newValue) {
+                                _selectedTransactionSpecificToPlanting.value = newValue; // Update the notifier value
+                              },
+                            ),
+                            SizedBox(height: 15),
+                            // Show Planting Dropdown if "Transaction Specific to Planting" is Yes
+                            ValueListenableBuilder<TransactionSpecificToPlanting?>(
+                              valueListenable: _selectedTransactionSpecificToPlanting,
+                              builder: (context, value, child) {
+                                if (value == TransactionSpecificToPlanting.Yes) {
+                                  return StreamBuilder<QuerySnapshot>(
+                                    stream: getAllPlantingsStream(), // Replace this with your actual Firestore stream
+                                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                      if (!snapshot.hasData) return Container(); // Or show a loading indicator
+      
+                                      return DropdownButtonFormField(
+                                        value: _plantingNameTransactionController.text.isEmpty ? null : _plantingNameTransactionController.text,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Select Planting *',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        isExpanded: false,
+                                        items: snapshot.data?.docs.map((DocumentSnapshot value) {
+                                          return DropdownMenuItem(
+                                            value: "${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}",
+                                            child: Text("${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}"),
+                                          );
+                                        }).toList(),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Please select necessary fields';
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (value) {
+                                          _plantingNameTransactionController.text = value.toString();
+                                          cropName = value?.split("|")[0].trim();
+                                          cropVariety = value?.split("|")[2].trim();
+                                        },
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  return SizedBox.shrink(); // No field shown
+                                }
+                              },
+                            ),
+                          ],
+                        );
+                      } else {
+                        return SizedBox.shrink(); // No second set of fields shown
+                      }
+                    },
+                  ),
+                  // TODO: ADD the Category class in income and expense (Impact: Optional)
+                  SizedBox(height: 15),
+                  if(type == "Income")
+                    DropdownButtonFormField<TypeOfIncome>(
+                    value: _selectedTypeOfIncome.value,
+                    decoration: InputDecoration(
+                      labelText: 'Type Of Income *',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: TypeOfIncome.values
+                        .map((option) => DropdownMenuItem<TypeOfIncome>(
+                      value: option,
+                      child: Text(option.toString().split('.')[1]),
+                    ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select necessary fields';
+                      }
+                      return null;
+                    },
+                    onChanged: (TypeOfIncome? newValue) {
+                      _selectedTypeOfIncome.value = newValue;
+                    },
+                  ),
+                  SizedBox(height: 15),
+                  if(type == "Income")
+                    ValueListenableBuilder<TypeOfIncome?>(
+                      valueListenable: _selectedTypeOfIncome,
+                      builder: (context, value, child) {
+                        if (value == TypeOfIncome.Other) {
+                          return TextFormField(
+                            controller: _incomeTypeOtherController,
+                            decoration: InputDecoration(
+                              labelText: 'Please specify other income *',
                               border: OutlineInputBorder(),
                             ),
-                            isExpanded: false,
-                            items: snapshot.data?.docs.map((value) {
-                              return DropdownMenuItem(
-                                value: value.get('name'),
-                                child: Text('${value.get('name')}'),
-                              );
-                            }).toList(),
                             validator: (value) {
-                              if (value == null) {
-                                return 'Please select necessary fields';
+                              if (value == null || value.isEmpty) {
+                                return 'This field cannot be empty';
                               }
                               return null;
-                            },
-                            onChanged: (value) {
-                              // Handle value change for field selection
-                              _fieldSelected.value = value != null;
-                              _selectedFieldName = value.toString();
                             },
                           );
-                        },
-                      );
-                    } else {
-                      return SizedBox.shrink(); // No field shown
-                    }
-                  },
-                ),
-                SizedBox(height: 15),
-                ValueListenableBuilder<bool>(
-                  valueListenable: _fieldSelected,
-                  builder: (context, fieldSelected, child) {
-                    if (fieldSelected) {
-                      return Column(
-                        children: [
-                          // Transaction Specific to Planting dropdown
-                          DropdownButtonFormField<TransactionSpecificToPlanting>(
-                            value: _selectedTransactionSpecificToPlanting.value,
-                            decoration: InputDecoration(
-                              labelText: 'Transaction Specific to Planting *',
-                              border: OutlineInputBorder(),
-                            ),
-                            items: TransactionSpecificToPlanting.values
-                                .map((option) => DropdownMenuItem<TransactionSpecificToPlanting>(
-                              value: option,
-                              child: Text(option.toString().split('.')[1]),
-                            ))
-                                .toList(),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please select necessary fields';
-                              }
-                              return null;
-                            },
-                            onChanged: (TransactionSpecificToPlanting? newValue) {
-                              _selectedTransactionSpecificToPlanting.value = newValue; // Update the notifier value
-                            },
-                          ),
-                          SizedBox(height: 15),
-                          // Show Planting Dropdown if "Transaction Specific to Planting" is Yes
-                          ValueListenableBuilder<TransactionSpecificToPlanting?>(
-                            valueListenable: _selectedTransactionSpecificToPlanting,
-                            builder: (context, value, child) {
-                              if (value == TransactionSpecificToPlanting.Yes) {
-                                return StreamBuilder<QuerySnapshot>(
-                                  stream: getAllPlantingsStream(), // Replace this with your actual Firestore stream
-                                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                                    if (!snapshot.hasData) return Container(); // Or show a loading indicator
-
-                                    return DropdownButtonFormField(
-                                      value: _plantingNameTransactionController.text.isEmpty ? null : _plantingNameTransactionController.text,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Select Planting *',
-                                        border: OutlineInputBorder(),
+                        }
+                        else if (value == TypeOfIncome.ChooseCategory) {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: Center(
+                                  child: StreamBuilder<QuerySnapshot>(
+                                    stream: getIncomeCategoriesViaStream(),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                                      if (!snapshot.hasData) return Container();
+                                      return DropdownButtonFormField(
+                                        decoration: const InputDecoration(
+                                          labelText: 'Select Income Category *',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        isExpanded: false,
+                                        value: _selectedIncomeCategory,
+                                        items: snapshot.data?.docs.map((value) {
+                                          return DropdownMenuItem(
+                                            value: value.get('categoryName'),
+                                            child: Text('${value.get('categoryName')}'),
+                                          );
+                                        }).toList(),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Please select necessary fields';
+                                          }
+                                          return null;
+                                        },
+                                        onChanged: (value) {
+                                          // debugPrint('selected onchange: $value');
+                                          _selectedIncomeCategory = value.toString();
+                                          _incomeTypeCategoryController.text = value.toString();
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 8.0,
+                                  left: 8.0,
+                                ),
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => IncomeCategoriesScreen(),
                                       ),
-                                      isExpanded: false,
-                                      items: snapshot.data?.docs.map((DocumentSnapshot value) {
-                                        return DropdownMenuItem(
-                                          value: "${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}",
-                                          child: Text("${value.get('cropName')} | ${value.get('varietyName')} | ${value.get('plantingDate')}"),
-                                        );
-                                      }).toList(),
-                                      validator: (value) {
-                                        if (value == null) {
-                                          return 'Please select necessary fields';
-                                        }
-                                        return null;
-                                      },
-                                      onChanged: (value) {
-                                        _plantingNameTransactionController.text = value.toString();
-                                        cropName = value?.split("|")[0].trim();
-                                        cropVariety = value?.split("|")[2].trim();
-                                      },
                                     );
                                   },
-                                );
-                              } else {
-                                return SizedBox.shrink(); // No field shown
-                              }
-                            },
-                          ),
-                        ],
-                      );
-                    } else {
-                      return SizedBox.shrink(); // No second set of fields shown
-                    }
-                  },
-                ),
-                // TODO: ADD the Category class in income and expense (Impact: Optional)
-                SizedBox(height: 15),
-                if(type == "Income")
-                  DropdownButtonFormField<TypeOfIncome>(
-                  value: _selectedTypeOfIncome.value,
-                  decoration: InputDecoration(
-                    labelText: 'Type Of Income *',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: TypeOfIncome.values
-                      .map((option) => DropdownMenuItem<TypeOfIncome>(
-                    value: option,
-                    child: Text(option.toString().split('.')[1]),
-                  ))
-                      .toList(),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select necessary fields';
-                    }
-                    return null;
-                  },
-                  onChanged: (TypeOfIncome? newValue) {
-                    _selectedTypeOfIncome.value = newValue;
-                  },
-                ),
-                SizedBox(height: 15),
-                if(type == "Income")
-                  ValueListenableBuilder<TypeOfIncome?>(
-                    valueListenable: _selectedTypeOfIncome,
+                                  backgroundColor: Color(0xff727530),
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                        else {
+                          return SizedBox.shrink();
+                        }
+                      },
+                    ),
+                  if(type == "Expense")
+                    DropdownButtonFormField<TypeOfExpense>(
+                      value: _selectedTypeOfExpense.value,
+                      decoration: InputDecoration(
+                        labelText: 'Type Of Expense *',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: TypeOfExpense.values
+                          .map((option) => DropdownMenuItem<TypeOfExpense>(
+                        value: option,
+                        child: Text(option.toString().split('.')[1]),
+                      ))
+                          .toList(),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select necessary fields';
+                        }
+                        return null;
+                      },
+                      onChanged: (TypeOfExpense? newValue) {
+                        _selectedTypeOfExpense.value = newValue;
+                      },
+                    ),
+                  SizedBox(height: 15),
+                  if(type == "Expense")
+                    ValueListenableBuilder<TypeOfExpense?>(
+                    valueListenable: _selectedTypeOfExpense,
                     builder: (context, value, child) {
-                      if (value == TypeOfIncome.Other) {
+                      if (value == TypeOfExpense.Other) {
                         return TextFormField(
-                          controller: _incomeTypeOtherController,
+                          controller: _expenseTypeOtherController,
                           decoration: InputDecoration(
-                            labelText: 'Please specify other income *',
+                            labelText: 'Please specify the expense *',
                             border: OutlineInputBorder(),
                           ),
                           validator: (value) {
@@ -260,27 +372,27 @@ class AddTransactionRecord extends StatelessWidget {
                           },
                         );
                       }
-                      else if (value == TypeOfIncome.ChooseCategory) {
+                      else if (value == TypeOfExpense.ChooseCategory) {
                         return Row(
                           children: [
                             Expanded(
                               child: Center(
                                 child: StreamBuilder<QuerySnapshot>(
-                                  stream: getIncomeCategoriesViaStream(),
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  stream: getExpenseCategoriesViaStream(),
+                                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                                     if (!snapshot.hasData) return Container();
-                                    return DropdownButtonFormField(
+      
+                                    return DropdownButtonFormField<String>(
                                       decoration: const InputDecoration(
-                                        labelText: 'Select Income Category *',
+                                        labelText: 'Select Expense Category *',
                                         border: OutlineInputBorder(),
                                       ),
                                       isExpanded: false,
-                                      value: _selectedIncomeCategory,
+                                      value: _selectedExpenseCategory,
                                       items: snapshot.data?.docs.map((value) {
-                                        return DropdownMenuItem(
-                                          value: value.get('categoryName'),
-                                          child: Text('${value.get('categoryName')}'),
+                                        return DropdownMenuItem<String>(
+                                          value: value.get('categoryName') as String,
+                                          child: Text(value.get('categoryName')),
                                         );
                                       }).toList(),
                                       validator: (value) {
@@ -290,9 +402,10 @@ class AddTransactionRecord extends StatelessWidget {
                                         return null;
                                       },
                                       onChanged: (value) {
-                                        // debugPrint('selected onchange: $value');
-                                        _selectedIncomeCategory = value.toString();
-                                        _incomeTypeCategoryController.text = value.toString();
+                                        // setState(() {
+                                          _selectedExpenseCategory = value;
+                                          _expenseTypeCategoryController.text = value.toString();
+                                        // });
                                       },
                                     );
                                   },
@@ -300,16 +413,13 @@ class AddTransactionRecord extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                right: 8.0,
-                                left: 8.0,
-                              ),
+                              padding: const EdgeInsets.only(right: 8.0, left: 8.0),
                               child: FloatingActionButton(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => IncomeCategoriesScreen(),
+                                      builder: (context) => ExpenseCategoriesScreen(),
                                     ),
                                   );
                                 },
@@ -328,171 +438,63 @@ class AddTransactionRecord extends StatelessWidget {
                       }
                     },
                   ),
-                if(type == "Expense")
-                  DropdownButtonFormField<TypeOfExpense>(
-                    value: _selectedTypeOfExpense.value,
+                  SizedBox(height: 15),
+                  TextFormField(
+                    controller: _earningAmountController,
                     decoration: InputDecoration(
-                      labelText: 'Type Of Expense *',
+                      labelText: 'How much did you ${type == "Income"?"earn":"spend"} *',
                       border: OutlineInputBorder(),
                     ),
-                    items: TypeOfExpense.values
-                        .map((option) => DropdownMenuItem<TypeOfExpense>(
-                      value: option,
-                      child: Text(option.toString().split('.')[1]),
-                    ))
-                        .toList(),
                     validator: (value) {
-                      if (value == null) {
-                        return 'Please select necessary fields';
+                      if (value!.isEmpty) {
+                        return 'This field is required';
                       }
                       return null;
                     },
-                    onChanged: (TypeOfExpense? newValue) {
-                      _selectedTypeOfExpense.value = newValue;
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _transactionDateController,
+                    onTap: () => _selectDate(context),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: 'Date of $type *',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'This field is required';
+                      }
+                      return null;
                     },
                   ),
-                SizedBox(height: 15),
-                if(type == "Expense")
-                  ValueListenableBuilder<TypeOfExpense?>(
-                  valueListenable: _selectedTypeOfExpense,
-                  builder: (context, value, child) {
-                    if (value == TypeOfExpense.Other) {
-                      return TextFormField(
-                        controller: _expenseTypeOtherController,
-                        decoration: InputDecoration(
-                          labelText: 'Please specify the expense *',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field cannot be empty';
-                          }
-                          return null;
-                        },
-                      );
-                    }
-                    else if (value == TypeOfExpense.ChooseCategory) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: Center(
-                              child: StreamBuilder<QuerySnapshot>(
-                                stream: getExpenseCategoriesViaStream(),
-                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (!snapshot.hasData) return Container();
-
-                                  return DropdownButtonFormField<String>(
-                                    decoration: const InputDecoration(
-                                      labelText: 'Select Expense Category *',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    isExpanded: false,
-                                    value: _selectedExpenseCategory,
-                                    items: snapshot.data?.docs.map((value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value.get('categoryName') as String,
-                                        child: Text(value.get('categoryName')),
-                                      );
-                                    }).toList(),
-                                    validator: (value) {
-                                      if (value == null) {
-                                        return 'Please select necessary fields';
-                                      }
-                                      return null;
-                                    },
-                                    onChanged: (value) {
-                                      // setState(() {
-                                        _selectedExpenseCategory = value;
-                                        _expenseTypeCategoryController.text = value.toString();
-                                      // });
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                            child: FloatingActionButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ExpenseCategoriesScreen(),
-                                  ),
-                                );
-                              },
-                              backgroundColor: Color(0xff727530),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    else {
-                      return SizedBox.shrink();
-                    }
-                  },
-                ),
-                SizedBox(height: 15),
-                TextFormField(
-                  controller: _earningAmountController,
-                  decoration: InputDecoration(
-                    labelText: 'How much did you ${type == "Income"?"earn":"spend"} *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _receiptNumberController,
+                    decoration: InputDecoration(
+                      labelText: 'Receipt # (Optional) ',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _transactionDateController,
-                  onTap: () => _selectDate(context),
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Date of $type *',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _customerNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name of Customer',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field is required';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _receiptNumberController,
-                  decoration: InputDecoration(
-                    labelText: 'Receipt # (Optional) ',
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: 'Notes (for your convenience)',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 4,
                   ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _customerNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Name of Customer',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: 'Notes (for your convenience)',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 4,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
