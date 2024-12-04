@@ -3,20 +3,6 @@ library appbar_dropdown;
 import 'package:flutter/material.dart';
 import 'package:intellifarm/external_libs/appbar_dropdown/src/mobile.dart';
 
-
-
-/// A dropdown button that shows a menu when pressed.
-/// 
-/// Use it like this :
-/// 
-///   return Scaffold(
-///          appBar: AppBar(
-///            flexibleSpace: AppBarDropdown(
-///              items: [ "User 1", "User 2", "User 3" ]
-///              selected: "User 2",
-///              title: ( (user) => user.toString() ),
-///              onClick: ( (user) => print(user) ),
-///           ),
 class AppbarDropdown<T> extends StatefulWidget {
 
   final List<T> items;
@@ -91,7 +77,11 @@ class AppbarDropdownState<T> extends State<AppbarDropdown<T>> {
                     child: Text(
                       _buildTitle(selected),
                       //'Test',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                      // style: Theme.of(context).textTheme.titleLarge,
                       overflow: TextOverflow.clip,
                       softWrap: false,
                       textAlign: TextAlign.center,
@@ -99,7 +89,7 @@ class AppbarDropdownState<T> extends State<AppbarDropdown<T>> {
                   ),
                 ),
                 // const Spacer(),
-                const Icon(Icons.arrow_drop_down),
+                const Icon(Icons.arrow_drop_down, color: Colors.white,),
                 const Spacer(),
               ],
             ),

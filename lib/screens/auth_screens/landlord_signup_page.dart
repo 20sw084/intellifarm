@@ -17,6 +17,8 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
   String _password = '';
   String _cpassword = '';
   String _phonenum = '';
+  bool _isPasswordVisible = false;
+  bool _isCPasswordVisible = false;
 
   AuthService authService = AuthService();
 
@@ -39,12 +41,8 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Perform sign-in logic here, e.g., authenticate user
-      // You can replace this with your authentication code
       log('Email: $_email');
-      // print('Password: $_password');
       signUp();
-      // Navigate to the next screen or perform other actions
     }
   }
 
@@ -67,39 +65,44 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(),
-                const SizedBox(
-                  height: 26,
-                ),
+                const SizedBox(height: 26),
                 TextFormField(
                   onChanged: (value) {
                     _email = value;
                   },
                   decoration: InputDecoration(
-                      enabledBorder: UnderlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                              color: Color(0xff727530), width: 2)),
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        size: 30,
+                    enabledBorder: UnderlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
                         color: Color(0xff727530),
+                        width: 2,
                       ),
-                      hintText: 'EMAIL',
-                      hintStyle:
-                          const TextStyle(color: Colors.grey, fontSize: 14)),
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      size: 30,
+                      color: Color(0xff727530),
+                    ),
+                    hintText: 'EMAIL',
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
-                const SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12),
                 TextFormField(
                   onChanged: (value) {
                     _phonenum = value;
                   },
                   decoration: InputDecoration(
                     enabledBorder: UnderlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                            color: Color(0xff727530), width: 2)),
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: Color(0xff727530),
+                        width: 2,
+                      ),
+                    ),
                     prefixIcon: const Icon(
                       Icons.phone_android_sharp,
                       size: 30,
@@ -112,57 +115,82 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12),
                 TextFormField(
                   onChanged: (value) {
                     _password = value;
                   },
+                  obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
-                      enabledBorder: UnderlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                              color: Color(0xff727530), width: 2)),
-                      prefixIcon: const Icon(
-                        Icons.password_outlined,
-                        size: 30,
+                    enabledBorder: UnderlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: Color(0xff727530),
+                        width: 2,
+                      ),
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.password_outlined,
+                      size: 30,
+                      color: Color(0xff727530),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                         color: Color(0xff727530),
                       ),
-                      hintText: 'PASSWORD',
-                      hintStyle:
-                          const TextStyle(color: Colors.grey, fontSize: 14)),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
+                    hintText: 'PASSWORD',
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
-                const SizedBox(
-                  height: 6,
-                ),
+                const SizedBox(height: 6),
                 TextFormField(
                   onChanged: (value) {
                     _cpassword = value;
                   },
+                  obscureText: !_isCPasswordVisible,
                   decoration: InputDecoration(
-                      enabledBorder: UnderlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                          color: Color(0xff727530),
-                          width: 2,
-                        ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: Color(0xff727530),
+                        width: 2,
                       ),
-                      prefixIcon: const Icon(
-                        Icons.password,
-                        size: 30,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.password,
+                      size: 30,
+                      color: Color(0xff727530),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isCPasswordVisible ? Icons.visibility : Icons.visibility_off,
                         color: Color(0xff727530),
                       ),
-                      hintText: 'CONFIRM PASSWORD',
-                      hintStyle:
-                          const TextStyle(color: Colors.grey, fontSize: 14)),
+                      onPressed: () {
+                        setState(() {
+                          _isCPasswordVisible = !_isCPasswordVisible;
+                        });
+                      },
+                    ),
+                    hintText: 'CONFIRM PASSWORD',
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
-                const SizedBox(
-                  height: 6,
-                ),
-                const SizedBox(
-                  height: 24,
-                ),
+                const SizedBox(height: 6),
+                const SizedBox(height: 24),
                 Container(
                   height: 50,
                   width: 200,
@@ -218,7 +246,8 @@ class _LandlordSignUpPageState extends State<LandlordSignUpPage> {
                     Navigator.pop(context);
                   },
                   style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey.shade600),
+                    foregroundColor: Colors.grey.shade600,
+                  ),
                   child: const Text(
                     'Already Have an Account? Login',
                   ),

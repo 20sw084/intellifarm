@@ -32,6 +32,8 @@ class ViewCropDetails extends StatelessWidget {
             // title: Text(values!.first),
             bottom: TabBar(
               isScrollable: true,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.grey,
               tabs: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.30,
@@ -92,7 +94,10 @@ class ViewCropDetails extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              dataMap["Harvest Unit:"].toString().split(".").last,
+                              dataMap["Harvest Unit:"]
+                                  .toString()
+                                  .split(".")
+                                  .last,
                               style: const TextStyle(
                                 fontSize: 12.5,
                               ),
@@ -149,7 +154,8 @@ class ViewCropDetails extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 12.5,
                                 ),
-                                maxLines: 1, overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -161,247 +167,393 @@ class ViewCropDetails extends StatelessWidget {
               ),
               // Varieties
               (int.parse(dataMap["Varieties:"]) > 0)
-                  ?
-              FutureBuilder(
-                future: getCropVarietyDataViaFuture(),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text("Error is: ${snapshot.error}"));
-                  } else if (snapshot.hasData) {
-                    var querySnapshot = snapshot.data;
-                    List<DocumentSnapshot> documents = querySnapshot.docs;
-                    return ListView.builder(
-                      itemCount: documents.length,
-                      itemBuilder: (context, index) {
-                        var firestoreData = documents[index].data() as Map<String, dynamic>;
-                        String varietyName = firestoreData['varietyName'] ?? '';
+                  ? FutureBuilder(
+                      future: getCropVarietyDataViaFuture(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text("Error is: ${snapshot.error}"));
+                        } else if (snapshot.hasData) {
+                          var querySnapshot = snapshot.data;
+                          List<DocumentSnapshot> documents = querySnapshot.docs;
+                          return ListView.builder(
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              var firestoreData = documents[index].data()
+                                  as Map<String, dynamic>;
+                              String varietyName =
+                                  firestoreData['varietyName'] ?? '';
 
-                        return FutureBuilder<int>(
-                          future: getPlantingsCountBasedOnVariety(varietyName),
-                          builder: (context, plantingSnapshot) {
-                            int plantingsCount = plantingSnapshot.data ?? 0;
-                            return SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: 220,
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        color: Colors.greenAccent,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 8.0),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  const Icon(Icons.kayaking),
-                                                  const SizedBox(width: 15),
-                                                  SizedBox(width: MediaQuery.of(context).size.width * 0.6,child: Text(varietyName, maxLines: 1, overflow: TextOverflow.ellipsis,)),
-                                                ],
+                              return FutureBuilder<int>(
+                                future: getPlantingsCountBasedOnVariety(
+                                    varietyName),
+                                builder: (context, plantingSnapshot) {
+                                  int plantingsCount =
+                                      plantingSnapshot.data ?? 0;
+                                  return SizedBox(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 220,
+                                    child: Card(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              color: Color(0xff727530),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        const Icon(
+                                                            Icons.kayaking,
+                                                            color:
+                                                                Colors.white),
+                                                        const SizedBox(
+                                                            width: 15),
+                                                        SizedBox(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.6,
+                                                          child: Text(
+                                                            varietyName,
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                          Icons.more_vert,
+                                                          color: Colors.white),
+                                                      onPressed: () {
+                                                        showMenu(
+                                                          context: context,
+                                                          position:
+                                                              const RelativeRect
+                                                                  .fromLTRB(100,
+                                                                  100, 0, 0),
+                                                          items: const [
+                                                            PopupMenuItem(
+                                                              value: 1,
+                                                              child: Text(
+                                                                  'Edit Record'),
+                                                            ),
+                                                            PopupMenuItem(
+                                                              value: 2,
+                                                              child: Text(
+                                                                  'Add Planting'),
+                                                            ),
+                                                            PopupMenuItem(
+                                                              value: 3,
+                                                              child: Text(
+                                                                  'Delete'),
+                                                            ),
+                                                          ],
+                                                          elevation: 8.0,
+                                                        ).then((value) {
+                                                          switch (value) {
+                                                            case 1:
+                                                              print(
+                                                                  'Option 1 selected');
+                                                              break;
+                                                            case 2:
+                                                              print(
+                                                                  'Option 2 selected');
+                                                              break;
+                                                            case 3:
+                                                              print(
+                                                                  'Option 3 selected');
+                                                              break;
+                                                          }
+                                                        });
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                              IconButton(
-                                                icon: const Icon(Icons.more_vert),
-                                                onPressed: () {
-                                                  showMenu(
-                                                    context: context,
-                                                    position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                                                    items: const [
-                                                      PopupMenuItem(
-                                                        value: 1,
-                                                        child: Text('Edit Record'),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 2,
-                                                        child: Text('Add Planting'),
-                                                      ),
-                                                      PopupMenuItem(
-                                                        value: 3,
-                                                        child: Text('Delete'),
-                                                      ),
-                                                    ],
-                                                    elevation: 8.0,
-                                                  ).then((value) {
-                                                    switch (value) {
-                                                      case 1:
-                                                        print('Option 1 selected');
-                                                        break;
-                                                      case 2:
-                                                        print('Option 2 selected');
-                                                        break;
-                                                      case 3:
-                                                        print('Option 3 selected');
-                                                        break;
-                                                    }
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                            buildInfoRow(
+                                                "LightProfile:",
+                                                firestoreData['lightProfile']
+                                                    .toString()
+                                                    .split(".")
+                                                    .last),
+                                            buildInfoRow(
+                                                "Field Type:",
+                                                firestoreData['fieldType']
+                                                    .toString()
+                                                    .split(".")
+                                                    .last),
+                                            buildInfoRow(
+                                                "Days to Maturity:",
+                                                firestoreData['daysToMaturity']
+                                                    .toString()),
+                                            buildInfoRow(
+                                                "Harvest Window:",
+                                                firestoreData[
+                                                        'harvestWindowDays']
+                                                    .toString()),
+                                            buildInfoRow(
+                                                "Plantings:",
+                                                plantingsCount
+                                                    .toString()), // Display the plantings count here
+                                            buildInfoRow(
+                                                "Notes:",
+                                                firestoreData['notes']
+                                                    .toString()),
+                                          ],
                                         ),
                                       ),
-                                      buildInfoRow("LightProfile:", firestoreData['lightProfile'].toString().split(".").last),
-                                      buildInfoRow("Field Type:", firestoreData['fieldType'].toString().split(".").last),
-                                      buildInfoRow("Days to Maturity:", firestoreData['daysToMaturity'].toString()),
-                                      buildInfoRow("Harvest Window:", firestoreData['harvestWindowDays'].toString()),
-                                      buildInfoRow("Plantings:", plantingsCount.toString()), // Display the plantings count here
-                                      buildInfoRow("Notes:", firestoreData['notes'].toString()),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          return const Center(child: Text("No data available"));
+                        }
                       },
-                    );
-                  } else {
-                    return const Center(child: Text("No data available"));
-                  }
-                },
-              )
+                    )
                   : Container(),
               // Plantings
               (int.parse(dataMap["Plantings:"]) > 0)
                   ? FutureBuilder(
-                future: getCropPlantingDataViaFuture(),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text("Error is: ${snapshot.error}"));
-                  } else if (snapshot.hasData) {
-                    var querySnapshot = snapshot.data;
-                    List<DocumentSnapshot> documents = querySnapshot.docs;
-                    return ListView.builder(
-                      itemCount: documents.length,
-                      itemBuilder: (context, index) {
-                        firestoreData = documents[index].data() as Map<String, dynamic>;
-                        // This should be the date retrieved from Firestore as a string
-                        final String plantingDateString = firestoreData?['plantingDate'].toString() ?? "2000-01-01";
+                      future: getCropPlantingDataViaFuture(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text("Error is: ${snapshot.error}"));
+                        } else if (snapshot.hasData) {
+                          var querySnapshot = snapshot.data;
+                          List<DocumentSnapshot> documents = querySnapshot.docs;
+                          return ListView.builder(
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              firestoreData = documents[index].data()
+                                  as Map<String, dynamic>;
+                              // This should be the date retrieved from Firestore as a string
+                              final String plantingDateString =
+                                  firestoreData?['plantingDate'].toString() ??
+                                      "2000-01-01";
 
-                        DateTime plantingDate = parseDateString(plantingDateString);
-                        int pdAge = calculateAgeInDays(plantingDate);
+                              DateTime plantingDate =
+                                  parseDateString(plantingDateString);
+                              int pdAge = calculateAgeInDays(plantingDate);
 
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: 330,
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    color: Colors.greenAccent,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.forest),
-                                              const SizedBox(
-                                                width: 15,
-                                              ),
-                                      SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.6,child: Text("${dataMap["Name:"].toString().split(".").last} :: ${firestoreData?['varietyName']} (${firestoreData?['fieldName']})", maxLines: 1, overflow: TextOverflow.ellipsis,)),
-                                            ],
+                              return SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: 330,
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          color: Color(0xff727530),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    const Icon(Icons.forest,
+                                                        color: Colors.white),
+                                                    const SizedBox(
+                                                      width: 15,
+                                                    ),
+                                                    SizedBox(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.6,
+                                                        child: Text(
+                                                          "${dataMap["Name:"].toString().split(".").last} :: ${firestoreData?['varietyName']} (${firestoreData?['fieldName']})",
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                          ),
+                                                        )),
+                                                  ],
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                      Icons.more_vert,
+                                                      color: Colors.white),
+                                                  onPressed: () {
+                                                    showMenu(
+                                                      context: context,
+                                                      position:
+                                                          const RelativeRect
+                                                              .fromLTRB(
+                                                              100, 100, 0, 0),
+                                                      items: const [
+                                                        PopupMenuItem(
+                                                          value: 1,
+                                                          child: Text(
+                                                              'Edit Record'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 2,
+                                                          child: Text(
+                                                              'View Report'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 3,
+                                                          child: Text(
+                                                              'Add Harvest'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 4,
+                                                          child: Text(
+                                                              'Add Treatment'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 5,
+                                                          child:
+                                                              Text('Add Task'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 6,
+                                                          child:
+                                                              Text('Duplicate'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: 7,
+                                                          child: Text('Delete'),
+                                                        ),
+                                                      ],
+                                                      elevation: 8.0,
+                                                    ).then((value) {
+                                                      switch (value) {
+                                                        case 1:
+                                                          // Navigator.push(context, MaterialPageRoute(builder: (context) => EditCropRecord(),));
+                                                          break;
+                                                        case 2:
+                                                          print(
+                                                              'Option 2 selected');
+                                                          break;
+                                                        case 3:
+                                                          print(
+                                                              'Option 3 selected');
+                                                          break;
+                                                        case 4:
+                                                          print(
+                                                              'Option 4 selected');
+                                                          break;
+                                                        case 5:
+                                                          print(
+                                                              'Option 5 selected');
+                                                          break;
+                                                        case 6:
+                                                          print(
+                                                              'Option 6 selected');
+                                                          break;
+                                                        case 7:
+                                                          print(
+                                                              'Option 7 selected');
+                                                          break;
+                                                      }
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          IconButton(
-                                            icon: const Icon(Icons.more_vert),
-                                            onPressed: () {
-                                              showMenu(
-                                                context: context,
-                                                position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                                                items: const [
-                                                  PopupMenuItem(
-                                                    value: 1,
-                                                    child: Text('Edit Record'),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 2,
-                                                    child: Text('View Report'),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 3,
-                                                    child: Text('Add Harvest'),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 4,
-                                                    child: Text('Add Treatment'),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 5,
-                                                    child: Text('Add Task'),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 6,
-                                                    child: Text('Duplicate'),
-                                                  ),
-                                                  PopupMenuItem(
-                                                    value: 7,
-                                                    child: Text('Delete'),
-                                                  ),
-                                                ],
-                                                elevation: 8.0,
-                                              ).then((value) {
-                                                switch (value) {
-                                                  case 1:
-                                                  // Navigator.push(context, MaterialPageRoute(builder: (context) => EditCropRecord(),));
-                                                    break;
-                                                  case 2:
-                                                    print('Option 2 selected');
-                                                    break;
-                                                  case 3:
-                                                    print('Option 3 selected');
-                                                    break;
-                                                  case 4:
-                                                    print('Option 4 selected');
-                                                    break;
-                                                  case 5:
-                                                    print('Option 5 selected');
-                                                    break;
-                                                  case 6:
-                                                    print('Option 6 selected');
-                                                    break;
-                                                  case 7:
-                                                    print('Option 7 selected');
-                                                    break;
-                                                }
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                        buildInfoRow(
+                                            "Status",
+                                            firestoreData?['plantingType']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow(
+                                            "Date",
+                                            firestoreData?['plantingDate']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow("Age",
+                                            "$pdAge days"), // Display the age in days
+                                        buildInfoRow(
+                                            "Field",
+                                            firestoreData?['fieldName']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow(
+                                            "Crop",
+                                            dataMap["Name:"]
+                                                .toString()
+                                                .split(".")
+                                                .last),
+                                        buildInfoRow(
+                                            "Distance",
+                                            firestoreData?[
+                                                        'distanceBetweenPlants']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow(
+                                            "Planted",
+                                            firestoreData?['quantityPlanted']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow(
+                                            "Estimated",
+                                            firestoreData?['estimatedYield']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow(
+                                            "Harvest Date",
+                                            firestoreData?['harvestDate']
+                                                    .toString() ??
+                                                " "),
+                                        buildInfoRow(
+                                            "Notes",
+                                            firestoreData?['notes']
+                                                    .toString() ??
+                                                " "),
+                                      ],
                                     ),
                                   ),
-                                  buildInfoRow("Status", firestoreData?['plantingType'].toString() ?? " "),
-                                  buildInfoRow("Date", firestoreData?['plantingDate'].toString() ?? " "),
-                                  buildInfoRow("Age", "$pdAge days"),  // Display the age in days
-                                  buildInfoRow("Field", firestoreData?['fieldName'].toString() ?? " "),
-                                  buildInfoRow("Crop", dataMap["Name:"].toString().split(".").last),
-                                  buildInfoRow("Distance", firestoreData?['distanceBetweenPlants'].toString() ?? " "),
-                                  buildInfoRow("Planted", firestoreData?['quantityPlanted'].toString() ?? " "),
-                                  buildInfoRow("Estimated", firestoreData?['estimatedYield'].toString() ?? " "),
-                                  buildInfoRow("Harvest Date", firestoreData?['harvestDate'].toString() ?? " "),
-                                  buildInfoRow("Notes", firestoreData?['notes'].toString() ?? " "),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return const Center(child: Text("No data available"));
+                        }
                       },
-                    );
-                  } else {
-                    return const Center(child: Text("No data available"));
-                  }
-                },
-              )
+                    )
                   : Container(),
             ],
           ),
@@ -410,14 +562,21 @@ class ViewCropDetails extends StatelessWidget {
     );
   }
 
-  Future getCropPlantingDataViaFuture() async{
+  Future getCropPlantingDataViaFuture() async {
     References r = References();
     String? id = await r.getLoggedUserId();
 
     try {
-      String? cropId = await r.getCropIdByName(dataMap["Name:"],);
+      String? cropId = await r.getCropIdByName(
+        dataMap["Name:"],
+      );
       if (id != null) {
-        return await r.usersRef.doc(id).collection("crops").doc(cropId).collection("plantings").get();
+        return await r.usersRef
+            .doc(id)
+            .collection("crops")
+            .doc(cropId)
+            .collection("plantings")
+            .get();
       } else {
         print("Error: User ID is null");
       }
@@ -459,14 +618,19 @@ class ViewCropDetails extends StatelessWidget {
     }
   }
 
-  Future getCropVarietyDataViaFuture() async{
+  Future getCropVarietyDataViaFuture() async {
     References r = References();
     String? id = await r.getLoggedUserId();
 
     try {
       String? cropId = await r.getCropIdByName(dataMap["Name:"]);
       if (id != null) {
-        return await r.usersRef.doc(id).collection("crops").doc(cropId).collection("varieties").get();
+        return await r.usersRef
+            .doc(id)
+            .collection("crops")
+            .doc(cropId)
+            .collection("varieties")
+            .get();
       } else {
         if (kDebugMode) {
           print("Error: User ID is null");

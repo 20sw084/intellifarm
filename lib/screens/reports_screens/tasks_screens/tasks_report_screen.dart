@@ -24,7 +24,8 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             IconButton(
               onPressed: () async {
@@ -201,7 +202,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
             title: ((user) => user.title),
             // ignore: avoid_print
             onClick: ((user) => print(user.title)),
-            dropdownAppBarColor: Colors.greenAccent,
+            dropdownAppBarColor: Color(0xff727530),
           ),
         ),
         body: Column(
@@ -234,7 +235,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                color: Colors.greenAccent,
+                color: Color(0xff727530),
                 height: 30,
                 width: MediaQuery.of(context).size.width,
                 child: Padding(
@@ -256,7 +257,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                 padding: EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.greenAccent,
+                    color: Color(0xff727530),
                     width: 2.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
@@ -270,7 +271,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                           'Date',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.greenAccent,
+                            color: Color(0xff727530),
                           ),
                         ),
                         SizedBox(
@@ -281,7 +282,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                           'Name',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.greenAccent,
+                            color: Color(0xff727530),
                           ),
                         ),
                       ],
@@ -290,7 +291,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                       'Field',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.greenAccent,
+                        color: Color(0xff727530),
                       ),
                     ),
                   ],
@@ -329,7 +330,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                             padding: EdgeInsets.all(10.0),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Colors.greenAccent,
+                                color: Color(0xff727530),
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
@@ -343,7 +344,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                                       t.taskDate,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.greenAccent,
+                                        color: Color(0xff727530),
                                       ),
                                     ),
                                     SizedBox(
@@ -354,7 +355,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                                       t.taskName,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        // color: Colors.greenAccent,
+                                        // color: Color(0xff727530),
                                       ),
                                     ),
                                   ],
@@ -363,7 +364,7 @@ class _TasksReportScreenState extends State<TasksReportScreen> {
                                   t.fieldName,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    // color: Colors.greenAccent,
+                                    // color: Color(0xff727530),
                                   ),
                                 ),
                               ],

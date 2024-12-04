@@ -16,7 +16,8 @@ class _DataSummaryScreenState extends State<DataSummaryScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             IconButton(
               onPressed: () {},
@@ -186,7 +187,8 @@ class _DataSummaryScreenState extends State<DataSummaryScreen> {
             title: ((user) => user.title),
             // ignore: avoid_print
             onClick: ((user) => print(user.title)),
-            dropdownAppBarColor: Colors.greenAccent,
+            dropdownAppBarColor: Color(0xff727530),
+
           ),
         ),
         body: Column(

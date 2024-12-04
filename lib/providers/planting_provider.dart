@@ -4,22 +4,34 @@ import '../controller/references.dart';
 
 class PlantingProvider with ChangeNotifier {
   List<DocumentSnapshot> _plantings = [];
+  bool _hasError = false;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  bool get hasError => _hasError;
 
   List<DocumentSnapshot> get plantings => _plantings;
 
   Future<void> fetchPlantings() async {
-    References r = References();
-    String? id = await r.getLoggedUserId();
-    QuerySnapshot cropsSnapshot =
-    await r.usersRef.doc(id).collection("crops").get();
-    List<DocumentSnapshot> allPlantings = [];
-    for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
-      QuerySnapshot plantingsSnapshot =
-      await cropDoc.reference.collection("plantings").get();
-      allPlantings.addAll(plantingsSnapshot.docs);
+    try {
+      _isLoading = true;
+      References r = References();
+      String? id = await r.getLoggedUserId();
+      QuerySnapshot cropsSnapshot =
+          await r.usersRef.doc(id).collection("crops").get();
+      List<DocumentSnapshot> allPlantings = [];
+      for (QueryDocumentSnapshot cropDoc in cropsSnapshot.docs) {
+        QuerySnapshot plantingsSnapshot =
+            await cropDoc.reference.collection("plantings").get();
+        allPlantings.addAll(plantingsSnapshot.docs);
+      }
+      _plantings = allPlantings;
+      _hasError = false;
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _hasError = true;
+      notifyListeners();
     }
-    _plantings = allPlantings;
-    notifyListeners();
   }
 
   void addPlanting(DocumentSnapshot planting) {

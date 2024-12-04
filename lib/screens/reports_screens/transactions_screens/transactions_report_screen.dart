@@ -394,7 +394,8 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             IconButton(
               onPressed: () async {
@@ -573,7 +574,7 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
             title: ((user) => user.title),
             // ignore: avoid_print
             onClick: ((user) => print(user.title)),
-            dropdownAppBarColor: Colors.greenAccent,
+            dropdownAppBarColor: Color(0xff727530),
           ),
         ),
         body: Column(
@@ -585,16 +586,16 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                 Container(
                   height: 45,
                   width: MediaQuery.of(context).size.width * 0.4,
-                  color: Colors.greenAccent,
+                  color: Color(0xff727530),
                   child: TextButton(
                     onPressed: () {},
                     child: Row(
                       children: const [
-                        Icon(Icons.abc),
+                        Icon(Icons.abc, color: Colors.white,),
                         SizedBox(
                           width: 10,
                         ),
-                        Text('Line Chart'),
+                        Text('Line Chart', style: TextStyle(color: Colors.white),),
                       ],
                     ),
                   ),
@@ -602,7 +603,7 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                 Container(
                   height: 45,
                   width: MediaQuery.of(context).size.width * 0.4,
-                  color: Colors.greenAccent,
+                  color: Color(0xff727530),
                   child: TextButton(
                     onPressed: () {
                       Navigator.push(
@@ -613,11 +614,11 @@ class _TransactionsReportScreenState extends State<TransactionsReportScreen> {
                     },
                     child: Row(
                       children: const [
-                        Icon(Icons.abc),
+                        Icon(Icons.abc, color: Colors.white,),
                         SizedBox(
                           width: 10,
                         ),
-                        Text('Data Summary'),
+                        Text('Data Summary', style: TextStyle(color: Colors.white),),
                       ],
                     ),
                   ),

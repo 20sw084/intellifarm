@@ -305,14 +305,18 @@ class PlantingsScreen extends StatelessWidget {
           ),
           body: Consumer<PlantingProvider>(
             builder: (context, plantingProvider, child) {
-              if (plantingProvider.plantings.isEmpty) {
+              if(plantingProvider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
+              } else if (plantingProvider.plantings.isEmpty && !plantingProvider.hasError) {
+                return const Center(child: Text("No plantings available"));
+              } else if (plantingProvider.hasError) {
+                return const Center(child: Text("An error occurred while fetching plantings"));
               } else {
                 return Consumer<SearchProvider>(
                   builder: (context, searchProvider, child) {
                     // Filter documents based on search query
                     var filteredDocuments =
-                        plantingProvider.plantings.where((doc) {
+                    plantingProvider.plantings.where((doc) {
                       var data = doc.data() as Map<String, dynamic>;
                       return data['cropName']
                           .toString()

@@ -2,12 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FarmersReportPdf {
-  /// Requests storage permissions and handles permission denial.
   Future<bool> requestStoragePermission() async {
     final status = await Permission.storage.request();
     if (status.isGranted) {
@@ -37,7 +35,7 @@ class FarmersReportPdf {
               pw.SizedBox(height: 16),
               pw.Text('Generated on: ${DateTime.now()}'),
               pw.SizedBox(height: 16),
-              pw.Table.fromTextArray(
+              pw.TableHelper.fromTextArray(
                 headers: ['Farmer Name', 'Phone Number', 'CNIC Number', 'Unique Code', 'Share Rule', 'Linked Planting Id'],
                 data: farmers.map((farmerDoc) {
                   var farmerData = farmerDoc.data() as Map<String, dynamic>;
@@ -63,23 +61,30 @@ class FarmersReportPdf {
 
     return pdf.save(); // Returns the PDF file as bytes
   }
-
-  /// Saves the generated PDF to the user's device.
   Future<String?> savePdf(Uint8List pdfBytes, String fileName) async {
-    // Request storage permission
+    // Request appropriate storage permission
     if (!await requestStoragePermission()) {
       print("Storage permission not granted. Cannot save file.");
       return null;
     }
 
-    // Get the app's documents directory (app-specific storage)
-    final directory = await getApplicationDocumentsDirectory();
+    try {
+      final directory = await getDownloadsDirectory(); //getApplicationDocumentsDirectory();//getExternalStorageDirectory();
+      if (directory == null) {
+        print("Could not get external storage directory.");
+        return null;
+      }
 
-    final path = '${directory.path}/$fileName.pdf';
-    final file = File(path);
-    await file.writeAsBytes(pdfBytes);
+      final path = '${directory.path}/$fileName.pdf';
+      final file = File(path);
+      await file.writeAsBytes(pdfBytes);
+      print("PDF saved at: $path");
 
-    print("PDF saved at: $path");
-    return path;
+      return path;
+    } catch (e) {
+      print("Error saving PDF: $e");
+      return null;
+    }
   }
+
 }

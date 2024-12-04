@@ -31,7 +31,7 @@ class EditCropRecord extends StatelessWidget {
 
     _selectedCropNotifier = ValueNotifier<CropType>(
       CropType.values.firstWhere(
-            (unit) => unit.toString().split('.')[1] == dataMap["Name:"].toString().split('.')[1],
+            (unit) => unit.toString().split('.')[1] == dataMap["Name:"],
         orElse: () => CropType.values.first, // Provide a default value
       ),
     );

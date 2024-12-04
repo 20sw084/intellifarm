@@ -222,7 +222,17 @@ class ViewImageScreen extends StatelessWidget {
             icon: Icon(Icons.done, color: Colors.white, size: 30),
             onPressed: () async {
               // Call saveImage with context and type
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+              );
               await _saveImage(context, type);
+              Navigator.pop(context);
             },
           ),
         ],
@@ -305,7 +315,3 @@ class ViewImageScreen extends StatelessWidget {
     }
   }
 }
-
-// Share Rule backend implementation:
-// State:
-// PDF on every page.

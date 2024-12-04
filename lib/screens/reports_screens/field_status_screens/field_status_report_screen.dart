@@ -399,7 +399,8 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color(0xff727530),
+          foregroundColor: Colors.white,
           actions: [
             IconButton(
               onPressed: () async {
@@ -425,7 +426,8 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
             title: ((user) => user.title),
             // ignore: avoid_print
             onClick: ((user) => print(user.title)),
-            dropdownAppBarColor: Colors.greenAccent,
+            dropdownAppBarColor: Color(0xff727530),
+
           ),
         ),
         body: Column(
@@ -489,7 +491,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                 padding: EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.greenAccent,
+                    color: Color(0xff727530),
                     width: 2.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
@@ -503,7 +505,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                           'Field',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.greenAccent,
+                            color: Color(0xff727530),
                           ),
                         ),
                         SizedBox(
@@ -513,7 +515,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                           'Crop',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.greenAccent,
+                            color: Color(0xff727530),
                           ),
                         ),
                       ],
@@ -525,11 +527,11 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                             'Planting',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.greenAccent,
+                              color: Color(0xff727530),
                             ),
                           ),
                           Divider(
-                            color: Colors.greenAccent,
+                            color: Color(0xff727530),
                             thickness: 2.0,
                           ),
                           Text(
@@ -589,7 +591,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                             padding: EdgeInsets.all(10.0),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Colors.greenAccent,
+                                color: Color(0xff727530),
                                 width: 2.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
@@ -607,7 +609,7 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                                           cr.fieldName!,
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.greenAccent,
+                                            color: Color(0xff727530),
                                           ),
                                         ),
                                       ),
@@ -633,11 +635,11 @@ class _FieldStatusReportScreenState extends State<FieldStatusReportScreen> {
                                         'Mar 17, 2024',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.greenAccent,
+                                          color: Color(0xff727530),
                                         ),
                                       ),
                                       Divider(
-                                        color: Colors.greenAccent,
+                                        color: Color(0xff727530),
                                         thickness: 2.0,
                                       ),
                                       Column(

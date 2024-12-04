@@ -73,3 +73,14 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// Farmer and Landlord profiles.
+// Plantings and Harvest screen has some type issues. Mainly crop name is not coming from backend in planting screen.
+// thyme new ki variety sahi jaga upload nh hwi.
+// Providers on remaining activities screens
+// Activities screen per freezing screen feature lagana hai
+// Type issues in transactions/transactions_screen.dart in income tab. and also provider in both tabs
+// field status screen has type issues
+// Share Rule backend implementation:
+// State:
+// PDF on every page.

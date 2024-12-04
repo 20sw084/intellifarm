@@ -25,17 +25,22 @@ dependencies:
   provider: ^6.1.2
   path_provider: ^2.1.4
   permission_handler: ^11.3.1
+  open_filex: ^4.5.0
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.1
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
-flutter:
+flutter_icons:
+  android: true
+  image_path: "assets/logo.png" # Make sure this path is correct and matches your project structure.
 
+flutter:
   uses-material-design: true
 
+  # Uncomment and update if needed
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

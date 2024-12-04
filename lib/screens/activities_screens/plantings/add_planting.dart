@@ -76,6 +76,7 @@ class AddPlanting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(cropName);
     cropNameNotifier.value = cropName;
     return SafeArea(
       child: Scaffold(

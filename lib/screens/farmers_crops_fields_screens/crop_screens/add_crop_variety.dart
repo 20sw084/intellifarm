@@ -47,9 +47,9 @@ class AddCropVariety extends StatelessWidget {
                     child: Row(
                       children: [
                         SizedBox(width: 10),
-                        Icon(Icons.kayaking),
+                        Icon(Icons.kayaking, color: Colors.white,),
                         SizedBox(width: 10),
-                        Text(cropName ?? "Crop Name not fetched"),
+                        Text(cropName, style: TextStyle(color: Colors.white)),
                       ],
                     ),
                   ),
