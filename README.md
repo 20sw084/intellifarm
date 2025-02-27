@@ -1,16 +1,15 @@
-# intellifarm
+# IntelliFarm
 
-Our FYP.
+IntelliFarm is a mobile application developed as our Final Year Project (FYP). It aims to provide intelligent farming solutions using advanced technologies.
 
-## Getting Started
+## Project Poster
 
-This project is a starting point for a Flutter application.
+![IntelliFarm Poster](Documents/IntelliFarm%20SPEOD%20Poster%20(Soft).png)
 
-A few resources to get you started if this is your first Flutter project:
+## How to Setup the Project
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+To contribute to this Flutter project, follow these setup guidelines:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/20sw084/intellifarm.git
